@@ -23,6 +23,7 @@ public:
     uint32_t getFiberId() const { return m_fiberId;}
     uint64_t getTime() const { return m_time;}
     const std::string& getContent() const { return m_content;}
+
         
 private:
     const char* m_file = nullptr;   // file name
@@ -45,6 +46,7 @@ public:
         ERROR = 4,
         FATAL = 5
     };
+
     static const char* ToString(LogLevel::Level level);
 };
 
@@ -52,23 +54,24 @@ public:
 class LogFormatter {
 public:
     typedef std::shared_ptr<LogFormatter> ptr;
-    LogFormatter(const std::string& pattern);
+    LogFormatter(const std::string& pattern);       // 实例化的时候输入pattern
 
     // %t   %thread_id %m%n
-    std::string format(LogEvent::ptr event);
+    std::string format(std::shared_ptr<Logger> logger, LogLevel::Level level, LogEvent::ptr event);
     // 日志解析子模块
-private:
+public:
     class FormatItem {
     public:
-        typedef std::shared_ptr<FormatItem> ptr;
+        typedef std::shared_ptr<FormatItem> ptr;    // 智能指针
+        FormatItem(const std::string& fmt = "") {};
         virtual ~FormatItem() {}
-        virtual void format(std::ostream& os, LogEvent::ptr event) = 0;
+        virtual void format(std::ostream& os, std::shared_ptr<Logger> logger, LogLevel::Level level, LogEvent::ptr event) = 0;
     };
 
-    void init();        // 解析pattern
+    void init();                                // 解析pattern
 private:
-    std::string m_pattern;
-    std::vector<FormatItem::ptr> m_items;
+    std::string m_pattern;                      // 输出的结果
+    std::vector<FormatItem::ptr> m_items;       // 定义很多不同的子类，每个子类负责输出对应的内容
 
 private:
 
@@ -81,7 +84,7 @@ public:
     typedef std::shared_ptr<LogAppender> ptr;
     virtual ~LogAppender() {}
 
-    virtual void log(LogLevel::Level level, LogEvent::ptr event) = 0;
+    virtual void log(std::shared_ptr<Logger> logger, LogLevel::Level level, LogEvent::ptr event) = 0;
 
     void setFormatter(LogFormatter::ptr val) { m_formatter = val;}
     LogFormatter::ptr getFormatter() const { return m_formatter};
@@ -108,6 +111,8 @@ public:
     void delAppender(LogEvent::ptr appender);
     LogLevel::Level getLevel() const {return m_level;}
     void setLevel(LogLevel::Level val) {m_level = val;}
+
+    const std::string& getName() const { return m_name;}
 private:
     std::string m_name;         // Logger name
     LogLevel::Level m_level;    // log level
