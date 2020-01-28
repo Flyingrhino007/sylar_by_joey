@@ -270,22 +270,29 @@ void LogFormatter::init() {
 
     static std::map<std::string, std::function<FormatItem::ptr(const std::string& str)> > s_format_items = {
 #define XX(str, C) \
-        {str, [](const std::string& fmt) { return FormatItem::ptr(new C(fmt));}}
+        {#str, [](const std::string& fmt) { return FormatItem::ptr(new C(fmt));}}
 
-        XX(m, MessageFormatItem);
-        XX(p, LevelFormatItem);
-        XX(r, ElapseFormatItem);
+        XX(m, MessageFormatItem);       // %m -- 消息体
+        XX(p, LevelFormatItem);         // %p -- level
+        XX(r, ElapseFormatItem);        // %r -- 启动后的时间
         XX(c, NameFormatItem);
         XX(t, ThreadIdFormatItem);
         XX(n, NewLineFormatItem);
         XX(d, DateTimeFormatItem);
         XX(f, FilenameFormatItem);
         XX(l, LineFormatItem);
+    // %c -- 日志名称
+    // %t -- 线程id
+    // %n -- 回车换行
+    // %d -- 时间
+    // %f -- 文件名
+    // %l -- 行号
 #undef XX
     };
 
     for(auto& i : vec) {
         if(std::get<2>(i) == 0) {
+            // 对应fmt_status == 0
             // string 类型
             m_items.push_back(FormatItem::ptr(new StringFormatItem(std::get<0>(i))));
         } else {
@@ -299,14 +306,6 @@ void LogFormatter::init() {
 
         std::cout << std::get<0>(i) << " - " << std::get<1>(i) << " - " << std::get<2>(i) << std::endl; 
     }
-    // %m -- 消息体
-    // %p -- level
-    // %r -- 启动后的时间
-    // %c -- 日志名称
-    // %t -- 线程id
-    // %n -- 回车换行
-    // %d -- 时间
-    // %f -- 文件名
-    // %l -- 行号
+    
 }
 
