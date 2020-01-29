@@ -5,10 +5,13 @@
 #include <stdint.h>
 #include <memory>
 #include <list>
-#include <stringstream>
+#include <sstream>
 #include <fstream>
+#include <vector>
 
 namespace sylar {
+
+class Logger;
 
 // Log event
 class LogEvent {
@@ -70,8 +73,12 @@ public:
 
     void init();                                // 解析pattern
 private:
-    std::string m_pattern;                      // 输出的结果
+    // 日志格式模板
+    std::string m_pattern;                 
+    // 日志格式解析后格式
     std::vector<FormatItem::ptr> m_items;       // 定义很多不同的子类，每个子类负责输出对应的内容
+    // 是否有错误
+    bool m_error = false;
 
 private:
 
@@ -87,14 +94,15 @@ public:
     virtual void log(std::shared_ptr<Logger> logger, LogLevel::Level level, LogEvent::ptr event) = 0;
 
     void setFormatter(LogFormatter::ptr val) { m_formatter = val;}
-    LogFormatter::ptr getFormatter() const { return m_formatter};
+    LogFormatter::ptr getFormatter() const { return m_formatter;}
 protected:
     LogLevel::Level m_level;            // protected 子类可用
-    LogFormatter::ptr m_formatter;
+    LogFormatter::ptr m_formatter;      // 记录的格式
 };
 
 // Logger
-class Logger {
+class Logger : public std::enable_shared_from_this<Logger>{
+    // 只有定义了enable_from_this，该类才能在自己的成员函数中获得指针
 public:
     typedef std::shared_ptr<Logger> ptr;
 
@@ -107,8 +115,8 @@ public:
     void error(LogEvent::ptr event);
     void fatal(LogEvent::ptr event);
 
-    void addAppender(LogEvent::ptr appender);
-    void delAppender(LogEvent::ptr appender);
+    void addAppender(LogAppender::ptr appender);
+    void delAppender(LogAppender::ptr appender);
     LogLevel::Level getLevel() const {return m_level;}
     void setLevel(LogLevel::Level val) {m_level = val;}
 
@@ -124,7 +132,7 @@ private:
 class StdoutLogAppender : public LogAppender {
 public:
     typedef std::shared_ptr<StdoutLogAppender> ptr;
-    void log(LogLevel::Level level, LogEvent::ptr event) override;   // override描述从虚基类继承出来的
+    void log(Logger::ptr logger, LogLevel::Level level, LogEvent::ptr event) override;   // override描述从虚基类继承出来的
 };
 
 // Appender to file
@@ -132,7 +140,7 @@ class FileLogAppender : public LogAppender {
 public:
     typedef std::shared_ptr<FileLogAppender> ptr;
     FileLogAppender(const std::string& flename);
-    void log(LogLevel::Level level, LogEvent::ptr event) override;
+    void log(Logger::ptr logger, LogLevel::Level level, LogEvent::ptr event) override;
     // 重新打开文件，文件打开成功，返回true
     bool reopen();
 private:
