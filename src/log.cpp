@@ -9,6 +9,17 @@ namespace sylar {
 
 class Logger;
 
+LogEvent::LogEvent(const char* file, int32_t line, uint32_t elapse
+            , uint32_t thread_id, uint32_t fiber_id, uint64_t time)
+    :m_file(file)
+    ,m_line(line)
+    ,m_elapse(elapse)
+    ,m_threadId(thread_id)
+    ,m_fiberId(fiber_id)
+    ,m_time(time) {
+    
+}
+
 const char* LogLevel::ToString(LogLevel::Level level) {
     switch(level) {
 #define XX(name) \
@@ -126,7 +137,7 @@ public:
 class StringFormatItem : public  LogFormatter::FormatItem {
 public:
     StringFormatItem(const std::string& str)
-        : FormatItem(str), m_string(str) {}
+        : m_string(str) {}
     void format(std::ostream& os, std::shared_ptr<Logger> logger, LogLevel::Level level, LogEvent::ptr event) override {
         os << m_string;
     }
@@ -135,10 +146,17 @@ private:
 };
 
 Logger::Logger(const std::string& name)
-    : m_name(name) {
+    : m_name(name)
+    ,m_level(LogLevel::DEBUG) {
+        // 日志级别初始化默认为最低级
+        m_formatter.reset(new LogFormatter("%d  [%p] %f %l %m %n"));
 }
 
 void Logger::addAppender(LogAppender::ptr appender) {
+    if(!appender->getFormatter()) {
+        // 如果当前appender的格式为空，就把Logger自己的格式指针给appender
+        appender->setFormatter(m_formatter);
+    }
     m_appenders.push_back(appender);
 }
 
@@ -225,14 +243,16 @@ void LogFormatter::init() {
     std::vector<std::tuple<std::string, std::string, int> >vec;
     std::string nstr;                       // 存储当前的string
     for(size_t i = 0; i < m_pattern.size(); ++i) {
-        if(m_pattern[i] != '%') {           // 如果当前字母bushi %，则放入到 str
+        if(m_pattern[i] != '%') {           // 如果当前字母不是 %，则放入到 str
             nstr.append(1, m_pattern[i]);   // 1表示添加1次，内容为m_pattern[i]
             continue;                       // 继续下一个字母
         }
 
-        if(((i + 1) < m_pattern.size()) && (m_pattern[i + 1] == '%')) {
-            nstr.append(1, '%');            // 连续2个%，表示其本身就是个%
-            continue;
+        if((i + 1) < m_pattern.size()) {
+            if(m_pattern[i + 1] == '%') {
+                nstr.append(1, '%');            // 连续2个%，表示其本身就是个%
+                continue;
+            }
         }
 
         size_t n = i + 1;
@@ -251,9 +271,9 @@ void LogFormatter::init() {
 
             if(fmt_status == 0) {
                 if(m_pattern[n] == '{') {
-                    str = m_pattern.substr(i + 1, n - i - 1);   // str 保存{左侧的字符串
+                    str = m_pattern.substr(i + 1, n - i - 1);   // str 保存左大括号左侧的字符串
                     fmt_status = 1;                             // 解析格式
-                    fmt_begin = n;                              // fmt_begin 记录的是{的位置
+                    fmt_begin = n;                              // fmt_begin 记录的是左大括号的位置
                     ++n;
                     continue;
                 }
@@ -286,7 +306,7 @@ void LogFormatter::init() {
             std::cout << "pattern parse error: " << m_pattern << "-" << m_pattern.substr(i) << std::endl;
             m_error = true;
             vec.push_back(std::make_tuple("<<pattern_error>>", fmt, 0));
-        }
+        }        
     }
     if(!nstr.empty()) {
         vec.push_back(std::make_tuple(nstr, "", 0));
@@ -324,5 +344,8 @@ void LogFormatter::init() {
         }
         std::cout << std::get<0>(i) << " - " << std::get<1>(i) << " - " << std::get<2>(i) << std::endl; 
     }
+}
+
+
 }
 

@@ -17,7 +17,8 @@ class Logger;
 class LogEvent {
 public:
     typedef std::shared_ptr<LogEvent> ptr;
-    LogEvent();
+    LogEvent(const char* file, int32_t m_line, uint32_t elapse
+            , uint32_t thread_id, uint32_t fiber_id, uint64_t time);
 
     const char* getFile() const { return m_file;}
     int32_t getLine() const { return m_line;}
@@ -25,8 +26,9 @@ public:
     uint32_t getThreadId() const { return m_threadId;}
     uint32_t getFiberId() const { return m_fiberId;}
     uint64_t getTime() const { return m_time;}
-    const std::string& getContent() const { return m_content;}
+    std::string getContent() const { return m_ss.str();}
 
+    std::stringstream& getSS() { return m_ss;} 
         
 private:
     const char* m_file = nullptr;   // file name
@@ -36,6 +38,7 @@ private:
     uint32_t m_fiberId = 0;         // coroutine id
     uint64_t m_time;                // timestamp
     std::string m_content;
+    std::stringstream m_ss;
 };
 
 // Log level
@@ -66,7 +69,7 @@ public:
     class FormatItem {
     public:
         typedef std::shared_ptr<FormatItem> ptr;    // 智能指针
-        FormatItem(const std::string& fmt = "") {};
+//        FormatItem(const std::string& fmt = "") {};
         virtual ~FormatItem() {}
         virtual void format(std::ostream& os, std::shared_ptr<Logger> logger, LogLevel::Level level, LogEvent::ptr event) = 0;
     };
@@ -124,8 +127,8 @@ public:
 private:
     std::string m_name;         // Logger name
     LogLevel::Level m_level;    // log level
-    std::list<LogAppender::ptr> m_appenders;   // Appender set
-
+    std::list<LogAppender::ptr> m_appenders;    // Appender set
+    LogFormatter::ptr m_formatter;              // 初始化时使用
 };
 
 // Appender to console
