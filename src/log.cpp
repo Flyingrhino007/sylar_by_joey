@@ -2,6 +2,7 @@
 #include <map>          // 关联容器
 #include <string>
 #include <iostream>
+#include <functional>
 
 //#include <cstring>
 
@@ -9,15 +10,45 @@ namespace sylar {
 
 class Logger;
 
-LogEvent::LogEvent(const char* file, int32_t line, uint32_t elapse
+LogEvent::LogEvent(std::shared_ptr<Logger> logger, LogLevel::Level level, const char* file, int32_t line, uint32_t elapse
             , uint32_t thread_id, uint32_t fiber_id, uint64_t time)
     :m_file(file)
     ,m_line(line)
     ,m_elapse(elapse)
     ,m_threadId(thread_id)
     ,m_fiberId(fiber_id)
-    ,m_time(time) {
+    ,m_time(time) 
+    ,m_logger(logger)
+    ,m_level(level) {
     
+}
+
+LogEventWrap::LogEventWrap(LogEvent::ptr e) 
+    :m_event(e) {
+
+}
+LogEventWrap:: ~LogEventWrap() {
+    m_event->getLogger()->log(m_event->getLevel(), m_event);
+}
+
+std::stringstream& LogEventWrap::getSS() {
+    return m_event->getSS();
+}
+
+void LogEvent::format(const char* fmt, ...) {
+    va_list al;
+    va_start(al, fmt);
+    format(fmt, al);
+    va_end(al);
+}
+
+void LogEvent::format(const char* fmt, va_list al) {
+    char* buf = nullptr;
+    int len = vasprintf(&buf, fmt, al);    // 成功len为buf的长度，失败len = -1
+    if(len != -1) {
+        m_ss << std::string(buf, len);
+        free(buf);
+    }
 }
 
 const char* LogLevel::ToString(LogLevel::Level level) {
@@ -89,10 +120,10 @@ public:
 
 class DateTimeFormatItem : public  LogFormatter::FormatItem {
 public:
-    DateTimeFormatItem(const std::string& format = "%Y:%m:%d %H:%M:%S") 
+    DateTimeFormatItem(const std::string& format = "%Y-%m-%d %H:%M:%S") 
         :m_format(format) {
         if(m_format.empty()) {
-            m_format = "%Y:%m:%d %H:%M:%S";
+            m_format = "%Y-%m-%d %H:%M:%S";
         }
     }
 
@@ -149,8 +180,18 @@ Logger::Logger(const std::string& name)
     : m_name(name)
     ,m_level(LogLevel::DEBUG) {
         // 日志级别初始化默认为最低级
-        m_formatter.reset(new LogFormatter("%d  [%p] %f %l %m %n"));
+        m_formatter.reset(new LogFormatter("%d{%Y-%m-%d %H:%M:%S}%T%t%T%F%T[%p]%T[%c]%T%f:%l%T%m%T%n"));
 }
+
+class TabFormatItem : public  LogFormatter::FormatItem {
+public:
+    TabFormatItem(const std::string& str = "") {}
+    void format(std::ostream& os, std::shared_ptr<Logger> logger, LogLevel::Level level, LogEvent::ptr event) override {
+        os << "\t";
+    }
+private:
+    std::string m_string;
+};
 
 void Logger::addAppender(LogAppender::ptr appender) {
     if(!appender->getFormatter()) {
@@ -221,12 +262,16 @@ bool FileLogAppender::reopen() {
 
 void StdoutLogAppender::log(std::shared_ptr<Logger> logger, LogLevel::Level level, LogEvent::ptr event) {
     if (level >= m_level) {
+        // 如果此事件的级别高于等于默认的m_level，才输出
+        // 输出到控制台打印
+        // 调用父类LogAppender的protected类成员LogFormatter m_formatter
         std::cout << m_formatter->format(logger, level, event);
     }
 }
 
 LogFormatter::LogFormatter(const std::string& pattern) 
     : m_pattern(pattern) {
+        init();
 }
 
 std::string LogFormatter::format (std::shared_ptr<Logger> logger, LogLevel::Level level, LogEvent::ptr event) {
@@ -325,6 +370,8 @@ void LogFormatter::init() {
         XX(d, DateTimeFormatItem),      // %d -- 时间
         XX(f, FilenameFormatItem),      // %f -- 文件名
         XX(l, LineFormatItem),          // %l -- 行号
+        XX(T, TabFormatItem),           // %T -- Tab
+        XX(F, FiberIdFormatItem),       // %F -- 协程id
 #undef XX
     };
 
@@ -338,14 +385,15 @@ void LogFormatter::init() {
             if (it == s_format_items.end()) {
                 m_items.push_back(FormatItem::ptr(new StringFormatItem("<<error_format %" + std::get<0>(i) + ">>")));
                 m_error = true;
+                std::cout << "****** Log parse error ******" << std::endl;
             } else {
                 m_items.push_back(it->second(std::get<1>(i)));
             }
         }
-        std::cout << std::get<0>(i) << " - " << std::get<1>(i) << " - " << std::get<2>(i) << std::endl; 
+//        std::cout << "(" << std::get<0>(i) << ") - (" << std::get<1>(i) << ") - (" << std::get<2>(i) << ")" << std::endl; 
     }
+//    std::cout << m_items.size() << std::endl;
 }
-
 
 }
 

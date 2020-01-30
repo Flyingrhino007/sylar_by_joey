@@ -4,3 +4,6 @@
 CMakeFiles/sylar.dir/src/log.cpp.o: ../src/log.cpp
 CMakeFiles/sylar.dir/src/log.cpp.o: ../src/log.h
 
+CMakeFiles/sylar.dir/src/util.cc.o: ../src/util.cc
+CMakeFiles/sylar.dir/src/util.cc.o: ../src/util.h
+

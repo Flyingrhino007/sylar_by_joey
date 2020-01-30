@@ -166,6 +166,33 @@ src/log.cpp.s:
 	$(MAKE) -f CMakeFiles/sylar.dir/build.make CMakeFiles/sylar.dir/src/log.cpp.s
 .PHONY : src/log.cpp.s
 
+src/util.o: src/util.cc.o
+
+.PHONY : src/util.o
+
+# target to build an object file
+src/util.cc.o:
+	$(MAKE) -f CMakeFiles/sylar.dir/build.make CMakeFiles/sylar.dir/src/util.cc.o
+.PHONY : src/util.cc.o
+
+src/util.i: src/util.cc.i
+
+.PHONY : src/util.i
+
+# target to preprocess a source file
+src/util.cc.i:
+	$(MAKE) -f CMakeFiles/sylar.dir/build.make CMakeFiles/sylar.dir/src/util.cc.i
+.PHONY : src/util.cc.i
+
+src/util.s: src/util.cc.s
+
+.PHONY : src/util.s
+
+# target to generate assembly for a file
+src/util.cc.s:
+	$(MAKE) -f CMakeFiles/sylar.dir/build.make CMakeFiles/sylar.dir/src/util.cc.s
+.PHONY : src/util.cc.s
+
 tests/test.o: tests/test.cpp.o
 
 .PHONY : tests/test.o
@@ -206,6 +233,9 @@ help:
 	@echo "... src/log.o"
 	@echo "... src/log.i"
 	@echo "... src/log.s"
+	@echo "... src/util.o"
+	@echo "... src/util.i"
+	@echo "... src/util.s"
 	@echo "... tests/test.o"
 	@echo "... tests/test.i"
 	@echo "... tests/test.s"

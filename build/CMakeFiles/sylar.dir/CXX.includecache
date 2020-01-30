@@ -15,6 +15,8 @@ string
 -
 iostream
 -
+functional
+-
 
 /home/sylar/src/log.h
 string
@@ -30,5 +32,7 @@ sstream
 fstream
 -
 vector
+-
+stdarg.h
 -
 

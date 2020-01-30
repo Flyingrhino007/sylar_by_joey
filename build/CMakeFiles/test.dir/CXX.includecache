@@ -21,8 +21,30 @@ fstream
 -
 vector
 -
+stdarg.h
+-
+
+/home/sylar/src/util.h
+pthread.h
+-
+unistd.h
+-
+sys/types.h
+-
+sys/syscall.h
+-
+stdio.h
+-
+stdint.h
+-
 
 /home/sylar/tests/test.cpp
+iostream
+-
+thread
+-
 ../src/log.h
 /home/sylar/src/log.h
+../src/util.h
+/home/sylar/src/util.h
 
