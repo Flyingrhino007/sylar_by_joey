@@ -45,8 +45,8 @@ void LogEvent::format(const char* fmt, va_list al) {
     char* buf = nullptr;
     int len = vasprintf(&buf, fmt, al);    // 成功len为buf的长度，失败len = -1
     if(len != -1) {
-        m_ss << std::string(buf, len);
-        free(buf);
+        m_ss << std::string(buf, len);      // 先写入到类的变量 m_ss 中
+        free(buf);                          // 记得要free掉buf
     }
 }
 
@@ -242,6 +242,7 @@ void Logger::fatal(LogEvent::ptr event) {
 
 FileLogAppender::FileLogAppender(const std::string& filename) 
     : m_filename(filename) {
+        reopen();
 }
 
 void FileLogAppender::log(std::shared_ptr<Logger> logger, LogLevel::Level level, LogEvent::ptr event) {
@@ -393,6 +394,18 @@ void LogFormatter::init() {
     }
 //    std::cout << m_items.size() << std::endl;
 }
+
+LoggerManager::LoggerManager(){
+    m_root.reset(new Logger);
+    m_root->addAppender(LogAppender::ptr(new StdoutLogAppender));
+}
+
+Logger::ptr LoggerManager::getLogger(const std::string& name) {
+    auto it = m_logger.find(name);
+    return it == m_logger.end()? m_root : it->second;
+}
+
+    void init();                    // 方便从配置文件直接读入
 
 }
 

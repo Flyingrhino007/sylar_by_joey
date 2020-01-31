@@ -6,6 +6,18 @@
 
 #IncludeRegexTransform: 
 
+/home/sylar/src/config.h
+memory
+-
+string
+-
+sstream
+-
+boost/lexical_cast.hpp
+-
+../src/log.h
+/home/sylar/src/log.h
+
 /home/sylar/src/log.h
 string
 -
@@ -46,13 +58,9 @@ stdio.h
 stdint.h
 -
 
-/home/sylar/tests/test.cpp
-iostream
--
-thread
--
+/home/sylar/tests/test_config.cc
 ../src/log.h
 /home/sylar/src/log.h
-../src/util.h
-/home/sylar/src/util.h
+../src/config.h
+/home/sylar/src/config.h
 

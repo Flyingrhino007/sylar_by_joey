@@ -15,8 +15,9 @@ int main(int argc, char** argv) {
 
     sylar::FileLogAppender::ptr file_appender(new sylar::FileLogAppender("./log.txt"));
     
-    sylar::LogFormatter::ptr fmt(new sylar::LogFormatter("%d%T%n"));
+    sylar::LogFormatter::ptr fmt(new sylar::LogFormatter("%d%T%p%T%m%n"));
     file_appender->setFormatter(fmt);
+    file_appender->setLevel(sylar::LogLevel::ERROR);
     
     logger->addAppender(file_appender);
 
@@ -31,6 +32,10 @@ int main(int argc, char** argv) {
     SYLAR_LOG_WARN(logger) << "WARN test";
 
     SYLAR_LOG_FMT_ERROR(logger, "test_marco fmt error %s", "aa");
+
+    auto ll = sylar::LoggerMgr::GetInstance()->getLogger("xx");
+    SYLAR_LOG_INFO(ll) << "jjjjjjjjjjoey";
+
     return 0;
 }
 

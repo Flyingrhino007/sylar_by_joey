@@ -9,6 +9,9 @@
 #include <fstream>
 #include <vector>
 #include <stdarg.h>
+#include <map>
+#include "singleton.h"
+#include "util.h"
 
 #define SYLAR_LOG_LEVEL(logger, level) \
     if(logger->getLevel() <= level) \
@@ -33,6 +36,8 @@
 #define SYLAR_LOG_FMT_WARN(logger, fmt, ...) SYLAR_LOG_FMT_LEVEL(logger, sylar::LogLevel::WARN, fmt, __VA_ARGS__)
 #define SYLAR_LOG_FMT_ERROR(logger, fmt, ...) SYLAR_LOG_FMT_LEVEL(logger, sylar::LogLevel::ERROR, fmt, __VA_ARGS__)
 #define SYLAR_LOG_FMT_FATAL(logger, fmt, ...) SYLAR_LOG_FMT_LEVEL(logger, sylar::LogLevel::FATAL, fmt, __VA_ARGS__)
+
+#define SYLAR_LOG_ROOT() sylar::LoggerMgr::GetInstance()->getRoot()
 
 namespace sylar {
 
@@ -73,7 +78,7 @@ public:
     std::shared_ptr<Logger> getLogger() { return m_logger;}
     LogLevel::Level getLevel() { return m_level;}
 
-    std::stringstream& getSS() { return m_ss;} 
+    std::stringstream& getSS() { return m_ss;}          // 返回的m_ss，放在 << 左边，接收字符串
     void format(const char* fmt, ...);
     void format(const char* fmt, va_list al);
         
@@ -144,6 +149,8 @@ public:
     virtual void log(std::shared_ptr<Logger> logger, LogLevel::Level level, LogEvent::ptr event) = 0;
 
     void setFormatter(LogFormatter::ptr val) { m_formatter = val;}
+    void setLevel(LogLevel::Level val) { m_level = val;}
+
     LogFormatter::ptr getFormatter() const { return m_formatter;}
 protected:
     // protected 子类可用
@@ -192,13 +199,32 @@ public:
     typedef std::shared_ptr<FileLogAppender> ptr;
     FileLogAppender(const std::string& flename);
     void log(Logger::ptr logger, LogLevel::Level level, LogEvent::ptr event) override;
+
     // 重新打开文件，文件打开成功，返回true
     bool reopen();
 private:
+    /// 文件路径及文件名
     std::string m_filename;
+    /// 文件流
     std::ofstream m_filestream;
+    /// 上次重新打开时间
+    uint64_t m_latTime = 0;
 };
 
+class LoggerManager {
+public:
+    LoggerManager();
+    Logger::ptr getLogger(const std::string& name);
+
+    void init();                    // 方便从配置文件直接读入
+
+    Logger::ptr getRoot() const { return m_root;} 
+private:
+    std::map<std::string, Logger::ptr> m_logger;
+    Logger::ptr m_root;
+};
+
+typedef sylar::Singleton<LoggerManager> LoggerMgr;
 
 }
 #endif

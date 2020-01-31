@@ -6,17 +6,21 @@
 
 #IncludeRegexTransform: 
 
-/home/sylar/src/log.cpp
-log.h
-/home/sylar/src/log.h
-map
+/home/sylar/src/config.cc
+../src/config.h
+/home/sylar/src/config.h
+
+/home/sylar/src/config.h
+memory
 -
 string
 -
-iostream
+sstream
 -
-functional
+boost/lexical_cast.hpp
 -
+../src/log.h
+/home/sylar/src/log.h
 
 /home/sylar/src/log.h
 string
@@ -34,5 +38,27 @@ fstream
 vector
 -
 stdarg.h
+-
+map
+-
+singleton.h
+/home/sylar/src/singleton.h
+util.h
+/home/sylar/src/util.h
+
+/home/sylar/src/singleton.h
+
+/home/sylar/src/util.h
+pthread.h
+-
+unistd.h
+-
+sys/types.h
+-
+sys/syscall.h
+-
+stdio.h
+-
+stdint.h
 -
 
