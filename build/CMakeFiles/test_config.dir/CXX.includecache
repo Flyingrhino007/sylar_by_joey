@@ -15,6 +15,8 @@ sstream
 -
 boost/lexical_cast.hpp
 -
+yaml-cpp/yaml.h
+-
 ../src/log.h
 /home/sylar/src/log.h
 
@@ -63,4 +65,6 @@ stdint.h
 /home/sylar/src/log.h
 ../src/config.h
 /home/sylar/src/config.h
+yaml-cpp/yaml.h
+/home/sylar/tests/yaml-cpp/yaml.h
 

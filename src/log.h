@@ -43,7 +43,7 @@ namespace sylar {
 
 class Logger;
 
-// Log level
+// Log level 日志级别
 class LogLevel {
 public:
     enum Level {
@@ -123,7 +123,8 @@ public:
         typedef std::shared_ptr<FormatItem> ptr;    // 智能指针
 //        FormatItem(const std::string& fmt = "") {};
         virtual ~FormatItem() {}
-        virtual void format(std::ostream& os, std::shared_ptr<Logger> logger, LogLevel::Level level, LogEvent::ptr event) = 0;
+        virtual void format(std::ostream& os, std::shared_ptr<Logger> logger, 
+                LogLevel::Level level, LogEvent::ptr event) = 0;
     };
 
     void init();                                // 解析pattern
@@ -140,7 +141,7 @@ private:
 };
 
 
-// Log output path
+// 输出到抽象文件或控制台的基类
 class LogAppender {
 public:
     typedef std::shared_ptr<LogAppender> ptr;
@@ -157,6 +158,32 @@ protected:
     LogLevel::Level m_level = LogLevel::DEBUG;      // 初始化level，不然会随机赋值，造成无法正常输出
     LogFormatter::ptr m_formatter;                  // 记录的格式
 };
+
+// Appender to console
+class StdoutLogAppender : public LogAppender {
+public:
+    typedef std::shared_ptr<StdoutLogAppender> ptr;
+    void log(std::shared_ptr<Logger> logger, LogLevel::Level level, LogEvent::ptr event) override;   // override描述从虚基类继承出来的
+};
+
+// Appender to file
+class FileLogAppender : public LogAppender {
+public:
+    typedef std::shared_ptr<FileLogAppender> ptr;
+    FileLogAppender(const std::string& flename);
+    void log(std::shared_ptr<Logger> logger, LogLevel::Level level, LogEvent::ptr event) override;
+
+    // 重新打开文件，文件打开成功，返回true
+    bool reopen();
+private:
+    /// 文件路径及文件名
+    std::string m_filename;
+    /// 文件流
+    std::ofstream m_filestream;
+    /// 上次重新打开时间
+    uint64_t m_latTime = 0;
+};
+
 
 // Logger
 class Logger : public std::enable_shared_from_this<Logger>{
@@ -180,36 +207,12 @@ public:
 
     const std::string& getName() const { return m_name;}
 private:
-    std::string m_name;         // Logger name
-    LogLevel::Level m_level;    // log level
+    std::string m_name;                         // Logger name
+    LogLevel::Level m_level;                    // log level
     std::list<LogAppender::ptr> m_appenders;    // Appender set
     LogFormatter::ptr m_formatter;              // 初始化时使用
 };
 
-// Appender to console
-class StdoutLogAppender : public LogAppender {
-public:
-    typedef std::shared_ptr<StdoutLogAppender> ptr;
-    void log(Logger::ptr logger, LogLevel::Level level, LogEvent::ptr event) override;   // override描述从虚基类继承出来的
-};
-
-// Appender to file
-class FileLogAppender : public LogAppender {
-public:
-    typedef std::shared_ptr<FileLogAppender> ptr;
-    FileLogAppender(const std::string& flename);
-    void log(Logger::ptr logger, LogLevel::Level level, LogEvent::ptr event) override;
-
-    // 重新打开文件，文件打开成功，返回true
-    bool reopen();
-private:
-    /// 文件路径及文件名
-    std::string m_filename;
-    /// 文件流
-    std::ofstream m_filestream;
-    /// 上次重新打开时间
-    uint64_t m_latTime = 0;
-};
 
 class LoggerManager {
 public:

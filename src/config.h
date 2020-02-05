@@ -12,6 +12,7 @@
 #include <string>
 #include <sstream>
 #include <boost/lexical_cast.hpp>
+#include <yaml-cpp/yaml.h>
 #include "../src/log.h"
 
 namespace sylar {
@@ -23,7 +24,7 @@ public:
     ConfigVarBase(const std::string& name, const std::string& description = "")
         :m_name(name)
         ,m_description(description) {
-
+            std::transform(m_name.begin(), m_name.end(), m_name.begin(), ::tolower);
     }
     virtual ~ConfigVarBase() {}        // 虚基类，使用虚析构函数方便释放内存
 
@@ -64,7 +65,7 @@ public:
 
     bool fromString(const std::string& val) override {
         try {
-
+            m_val = boost::lexical_cast<T>(val);
         } catch (std::exception& e) {
             SYLAR_LOG_ERROR(SYLAR_LOG_ROOT()) << "ConfigVar::fromString exception"
                 << e.what() << " convert: string to " << typeid(m_val).name();
@@ -112,12 +113,14 @@ public:
         }
         return std::dynamic_pointer_cast<ConfigVar<T> >(it->second);
     }
+
+    static void LoadFromYaml(const YAML::Node& root);
+
+    static ConfigVarBase::ptr LookupBase(const std::string& name);
 private:
     static ConfigVarMap s_datas;
-
 };
 
 }
-
 
 #endif

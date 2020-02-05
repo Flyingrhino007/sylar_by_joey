@@ -10,46 +10,6 @@ namespace sylar {
 
 class Logger;
 
-LogEvent::LogEvent(std::shared_ptr<Logger> logger, LogLevel::Level level, const char* file, int32_t line, uint32_t elapse
-            , uint32_t thread_id, uint32_t fiber_id, uint64_t time)
-    :m_file(file)
-    ,m_line(line)
-    ,m_elapse(elapse)
-    ,m_threadId(thread_id)
-    ,m_fiberId(fiber_id)
-    ,m_time(time) 
-    ,m_logger(logger)
-    ,m_level(level) {
-}
-
-LogEventWrap::LogEventWrap(LogEvent::ptr e) 
-    :m_event(e) {
-}
-
-LogEventWrap:: ~LogEventWrap() {
-    m_event->getLogger()->log(m_event->getLevel(), m_event);
-}
-
-std::stringstream& LogEventWrap::getSS() {
-    return m_event->getSS();
-}
-
-void LogEvent::format(const char* fmt, ...) {
-    va_list al;
-    va_start(al, fmt);
-    format(fmt, al);
-    va_end(al);
-}
-
-void LogEvent::format(const char* fmt, va_list al) {
-    char* buf = nullptr;
-    int len = vasprintf(&buf, fmt, al);    // 成功len为buf的长度，失败len = -1
-    if(len != -1) {
-        m_ss << std::string(buf, len);      // 先写入到类的变量 m_ss 中
-        free(buf);                          // 记得要free掉buf
-    }
-}
-
 const char* LogLevel::ToString(LogLevel::Level level) {
     switch(level) {
 #define XX(name) \
@@ -68,6 +28,61 @@ const char* LogLevel::ToString(LogLevel::Level level) {
     }
     return "UNKOWN";
 }
+
+LogEvent::LogEvent(std::shared_ptr<Logger> logger, LogLevel::Level level, const char* file, int32_t line, uint32_t elapse
+            , uint32_t thread_id, uint32_t fiber_id, uint64_t time)
+    :m_file(file)
+    ,m_line(line)
+    ,m_elapse(elapse)
+    ,m_threadId(thread_id)
+    ,m_fiberId(fiber_id)
+    ,m_time(time) 
+    ,m_logger(logger)
+    ,m_level(level) {
+}
+
+void LogEvent::format(const char* fmt, ...) {
+    va_list al;
+    va_start(al, fmt);
+    format(fmt, al);
+    va_end(al);
+}
+
+void LogEvent::format(const char* fmt, va_list al) {
+    char* buf = nullptr;
+    int len = vasprintf(&buf, fmt, al);    // 成功len为buf的长度，失败len = -1
+    if(len != -1) {
+        m_ss << std::string(buf, len);      // 先写入到类的变量 m_ss 中
+        free(buf);                          // 记得要free掉buf
+    }
+}
+
+LogEventWrap::LogEventWrap(LogEvent::ptr e) 
+    :m_event(e) {
+}
+
+LogEventWrap::~LogEventWrap() {
+    m_event->getLogger()->log(m_event->getLevel(), m_event);
+}
+
+std::stringstream& LogEventWrap::getSS() {
+    return m_event->getSS();
+}
+
+LogFormatter::LogFormatter(const std::string& pattern) 
+    : m_pattern(pattern) {
+        init();
+}
+
+// 返回 string 变量
+std::string LogFormatter::format (std::shared_ptr<Logger> logger, LogLevel::Level level, LogEvent::ptr event) {
+    std::stringstream ss;
+    for(auto&i : m_items) {
+        i->format(ss, logger, level, event);
+    }
+    return ss.str();
+}
+
 
 class MessageFormatItem : public  LogFormatter::FormatItem {
 public:
@@ -175,13 +190,6 @@ private:
     std::string m_string;
 };
 
-Logger::Logger(const std::string& name)
-    : m_name(name)
-    ,m_level(LogLevel::DEBUG) {
-        // 日志级别初始化默认为最低级
-        m_formatter.reset(new LogFormatter("%d{%Y-%m-%d %H:%M:%S}%T%t%T%F%T[%p]%T[%c]%T%f:%l%T%m%T%n"));
-}
-
 class TabFormatItem : public  LogFormatter::FormatItem {
 public:
     TabFormatItem(const std::string& str = "") {}
@@ -191,96 +199,6 @@ public:
 private:
     std::string m_string;
 };
-
-void Logger::addAppender(LogAppender::ptr appender) {
-    if(!appender->getFormatter()) {
-        // 如果当前appender的格式为空，就把Logger自己的格式指针给appender
-        appender->setFormatter(m_formatter);
-    }
-    m_appenders.push_back(appender);
-}
-
-void Logger::delAppender(LogAppender::ptr appender) {
-    for(auto it = m_appenders.begin();
-            it != m_appenders.end(); ++it) {
-        if (*it == appender) {
-            m_appenders.erase(it);
-            break;
-        }
-    }
-}
-
-
-void Logger::log(LogLevel::Level level, LogEvent::ptr event) {
-    if (level >= m_level) {
-        auto self = shared_from_this();
-        for(auto& i : m_appenders) {
-            i->log(self, level, event);     // 将事件进行登记
-        }
-    }
-}
-
-void Logger::debug(LogEvent::ptr event) {
-    log(LogLevel::DEBUG, event);
-}
-    
-void Logger::info(LogEvent::ptr event) {
-    log(LogLevel::INFO, event);
-}
-
-void Logger::warn(LogEvent::ptr event) {
-    log(LogLevel::WARN, event);
-}
-
-void Logger::error(LogEvent::ptr event) {
-    log(LogLevel::ERROR, event);
-}
-
-void Logger::fatal(LogEvent::ptr event) {
-    log(LogLevel::FATAL, event);
-}
-
-FileLogAppender::FileLogAppender(const std::string& filename) 
-    : m_filename(filename) {
-        reopen();
-}
-
-void FileLogAppender::log(std::shared_ptr<Logger> logger, LogLevel::Level level, LogEvent::ptr event) {
-    if(level >= m_level) {
-        // 将event事件按照m_formatter的格式，输出到string类型的m_filestream中
-        m_filestream << m_formatter->format(logger, level, event);
-    }
-}
-
-bool FileLogAppender::reopen() {
-    if (m_filestream) {
-        m_filestream.close();
-    } 
-    m_filestream.open(m_filename);
-    return !!m_filestream;      // ??????????????????????
-}
-
-void StdoutLogAppender::log(std::shared_ptr<Logger> logger, LogLevel::Level level, LogEvent::ptr event) {
-    if (level >= m_level) {
-        // 如果此事件的级别高于等于默认的m_level，才输出
-        // 输出到控制台打印
-        // 调用父类LogAppender的protected类成员LogFormatter m_formatter
-        std::cout << m_formatter->format(logger, level, event);
-    }
-}
-
-LogFormatter::LogFormatter(const std::string& pattern) 
-    : m_pattern(pattern) {
-        init();
-}
-
-std::string LogFormatter::format (std::shared_ptr<Logger> logger, LogLevel::Level level, LogEvent::ptr event) {
-    std::stringstream ss;
-    for(auto&i : m_items) {
-        i->format(ss, logger, level, event);
-    }
-    return ss.str();
-}
 
 void LogFormatter::init() {
     // 日志格式的解析，3种格式分别是  %xxx  %xxx{xxx}  %%
@@ -394,6 +312,92 @@ void LogFormatter::init() {
     }
 //    std::cout << m_items.size() << std::endl;
 }
+
+Logger::Logger(const std::string& name)
+    : m_name(name)
+    ,m_level(LogLevel::DEBUG) {
+        // 日志级别初始化默认为最低级
+        m_formatter.reset(new LogFormatter("%d{%Y-%m-%d %H:%M:%S}%T%t%T%F%T[%p]%T[%c]%T%f:%l%T%m%T%n"));
+}
+
+
+void StdoutLogAppender::log(std::shared_ptr<Logger> logger, LogLevel::Level level, LogEvent::ptr event) {
+    if (level >= m_level) {
+        // 如果此事件的级别高于等于默认的m_level，才输出
+        // 输出到控制台打印
+        // 调用父类LogAppender的protected类成员LogFormatter m_formatter
+        std::cout << m_formatter->format(logger, level, event);
+    }
+}
+
+FileLogAppender::FileLogAppender(const std::string& filename) 
+    : m_filename(filename) {
+        reopen();
+}
+
+void FileLogAppender::log(std::shared_ptr<Logger> logger, LogLevel::Level level, LogEvent::ptr event) {
+    if(level >= m_level) {
+        // 将event事件按照m_formatter的格式，输出到string类型的m_filestream中
+        m_filestream << m_formatter->format(logger, level, event);
+    }
+}
+
+bool FileLogAppender::reopen() {
+    if (m_filestream) {
+        m_filestream.close();
+    } 
+    m_filestream.open(m_filename, std::ios::app);
+    return !!m_filestream;      // ??????????????????????
+}
+
+void Logger::addAppender(LogAppender::ptr appender) {
+    if(!appender->getFormatter()) {
+        // 如果当前appender的格式为空，就把Logger自己的格式指针给appender
+        appender->setFormatter(m_formatter);
+    }
+    m_appenders.push_back(appender);
+}
+
+void Logger::delAppender(LogAppender::ptr appender) {
+    for(auto it = m_appenders.begin();
+            it != m_appenders.end(); ++it) {
+        if (*it == appender) {
+            m_appenders.erase(it);
+            break;
+        }
+    }
+}
+
+
+void Logger::log(LogLevel::Level level, LogEvent::ptr event) {
+    if (level >= m_level) {
+        auto self = shared_from_this();
+        for(auto& i : m_appenders) {
+            i->log(self, level, event);     // 将事件进行登记
+        }
+    }
+}
+
+void Logger::debug(LogEvent::ptr event) {
+    log(LogLevel::DEBUG, event);
+}
+    
+void Logger::info(LogEvent::ptr event) {
+    log(LogLevel::INFO, event);
+}
+
+void Logger::warn(LogEvent::ptr event) {
+    log(LogLevel::WARN, event);
+}
+
+void Logger::error(LogEvent::ptr event) {
+    log(LogLevel::ERROR, event);
+}
+
+void Logger::fatal(LogEvent::ptr event) {
+    log(LogLevel::FATAL, event);
+}
+
 
 LoggerManager::LoggerManager(){
     m_root.reset(new Logger);
