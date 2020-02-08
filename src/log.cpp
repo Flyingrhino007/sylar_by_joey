@@ -3,6 +3,7 @@
 #include <string>
 #include <iostream>
 #include <functional>
+#include "config.h"
 
 //#include <cstring>
 
@@ -112,7 +113,7 @@ class NameFormatItem : public  LogFormatter::FormatItem {
 public:
     NameFormatItem(const std::string& str = "") {}
     void format(std::ostream& os, std::shared_ptr<Logger> logger, LogLevel::Level level, LogEvent::ptr event) override {
-        os << logger->getName();
+        os << event->getLogger()->getName();
     }
 };
 
@@ -320,6 +321,23 @@ Logger::Logger(const std::string& name)
         m_formatter.reset(new LogFormatter("%d{%Y-%m-%d %H:%M:%S}%T%t%T%F%T[%p]%T[%c]%T%f:%l%T%m%T%n"));
 }
 
+void Logger::setFormatter(LogFormatter::ptr val) {
+    m_formatter = val;
+}
+
+void Logger::setFormatter(const std::string& val) {
+    sylar::LogFormatter::ptr new_val(new sylar::LogFormatter(val));
+    if(new_val->isError()) {
+        // 防止出错
+        return;
+    }
+    m_formatter = new_val;
+}
+
+LogFormatter::ptr Logger::getFormatter() {
+
+}
+
 
 void StdoutLogAppender::log(std::shared_ptr<Logger> logger, LogLevel::Level level, LogEvent::ptr event) {
     if (level >= m_level) {
@@ -368,12 +386,19 @@ void Logger::delAppender(LogAppender::ptr appender) {
     }
 }
 
+void Logger::clearAppenders() {
+    m_appenders.clear();
+}
 
 void Logger::log(LogLevel::Level level, LogEvent::ptr event) {
     if (level >= m_level) {
         auto self = shared_from_this();
-        for(auto& i : m_appenders) {
-            i->log(self, level, event);     // 将事件进行登记
+        if(!m_appenders.empty()) {
+            for(auto& i : m_appenders) {
+                i->log(self, level, event);     // 将事件进行登记
+            }
+        } else if(m_root) {
+            m_root->log(level, event);
         }
     }
 }
@@ -402,14 +427,99 @@ void Logger::fatal(LogEvent::ptr event) {
 LoggerManager::LoggerManager(){
     m_root.reset(new Logger);
     m_root->addAppender(LogAppender::ptr(new StdoutLogAppender));
+
+    init();
 }
 
 Logger::ptr LoggerManager::getLogger(const std::string& name) {
     auto it = m_logger.find(name);
-    return it == m_logger.end()? m_root : it->second;
+    if(it != m_logger.end()) {
+        return it->second;
+    }
+
+    Logger::ptr logger(new Logger(name));
+    logger->m_root = m_root;
+    m_loggers[name] = logger;
+    return logger;
 }
 
-    void init();                    // 方便从配置文件直接读入
+struct LogAppenderDefine {
+    int type = 0;   // 1 File, 2 Stdout
+    LogLevel::Level level = LogLevel::UNKOWN;
+    std::string formatter;
+    std::string file;
+
+    bool operator==(const LogAppenderDefine& oth) const {
+        return type == oth.type
+            && level == oth.type
+            && formatter == oth.formatter
+            && file == oth.file;
+    }
+};
+
+struct LogDefine {
+    std::string name;
+    LogLevel::Level level = LogLevel::UNKOWN;
+    std::string formatter;
+    std::vector<LogAppenderDefine> appenders;
+
+    bool operator==(const LogDefine& oth) const {
+        return name == oth.name
+            && level == oth.level
+            && formatter == oth.formatter
+            && appenders == oth.appenders;
+    }
+    
+    bool operator<(const LogDefine& oth) const {
+        return name < oth.name;
+    }
+};
+
+// 用set而不用vector，去重好一些
+// 就需要重载operator < 函数
+sylar::ConfigVar<std::set<LogDefine> > g_log_defines = 
+    sylar::Config::Lookup("logs", std::set<LogDefine>(), "logs config");
+
+// main 函数之前执行，全局对象！全局对象在main函数之前构造，其在构建时会调用其构造函数
+// 可在其构造函数内加一些事件
+
+struct LogIniter {
+    LogIniter() {
+        g_log_defines->addListener(0xF1E231, [](const std::set<LogDefine>& old_Value,
+                    const std::set<LogDefine>& new_value){
+                // 新增日志
+            for(auto& i : new_value) {
+                auto it = old_value.find(i);
+                if(it == old_value.end()) {
+                    // 新增logge
+                sylar::Logger::ptr logger (new sylar::Logger(i.name));
+                logger->setLevel(i.level);
+                if(!i.formatter.empty()) {
+                    logger->
+                }
+                logger->
+                } else {
+                    if(!(i == *it)) {
+                        // 修改的logger，在old_value里有，但是和new_value里对应的不同，所以要修改
+                    }
+                }
+            }
+            for(auto& i : old_value) {
+                auto it = new_value.find(i);
+                if(it == new_value.end()) {
+                    // 删除logger，不是真正的删除，关闭文件或者把日志级别设置得很高
+                    auto logger =  SYLAR_LOG_NAME(i.name);
+                    logger->setLevel((LogLevel::Level)100);
+                    logger->clearAppenders();
+                }
+            }
+        });
+    }
+};
+
+void LoggerManager::init() {
+
+}
 
 }
 

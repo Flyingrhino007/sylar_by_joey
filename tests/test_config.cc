@@ -193,7 +193,7 @@ void test_class() {
     XX_PM(g_person_map, "class.map before");
     SYLAR_LOG_INFO(SYLAR_LOG_ROOT()) << "before: "  << g_person_map_vec->toString();
     
-    YAML::Node root = YAML::LoadFile("/home/sylar/bin/conf/log.yml");
+    YAML::Node root = YAML::LoadFile("/home/sylar/bin/conf/test.yml");
     sylar::Config::LoadFromYaml(root);
 
     SYLAR_LOG_INFO(SYLAR_LOG_ROOT()) << "after: "  << g_person->getValue().toString() << " - " << g_person->toString();
