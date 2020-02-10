@@ -218,13 +218,11 @@ public:
     void format(std::ostream& os, std::shared_ptr<Logger> logger, LogLevel::Level level, LogEvent::ptr event) override {
         os << "\t";
     }
-private:
-    std::string m_string;
 };
 
 void LogFormatter::init() {
     // 日志格式的解析，3种格式分别是  %xxx  %xxx{xxx}  %%
-    //str, format, type 三元组
+    // str, format, type 三元组
     std::vector<std::tuple<std::string, std::string, int> >vec;
     std::string nstr;                       // 存储当前的string
     for(size_t i = 0; i < m_pattern.size(); ++i) {
@@ -275,6 +273,7 @@ void LogFormatter::init() {
                 if(str.empty()) {
                     str = m_pattern.substr(i + 1);
                 }
+                // 遇到模板最后只有左大括号，没有右大括号的情况时怎么办？
             }
         }
 
@@ -338,6 +337,7 @@ void LogFormatter::init() {
 Logger::Logger(const std::string& name)
     : m_name(name)
     ,m_level(LogLevel::DEBUG) {
+        // 遇到模板最后只有左大括号，没有右大括号的情况时怎么办？
         // 日志级别初始化默认为最低级
         m_formatter.reset(new LogFormatter("%d{%Y-%m-%d %H:%M:%S}%T%t%T%F%T[%p]%T[%c]%T%f:%l%T%m%T%n"));
 }
@@ -347,6 +347,7 @@ void Logger::setFormatter(LogFormatter::ptr val) {
     m_formatter = val;
     for(auto& i : m_appenders) {
         if(!i->m_hasFormatter) {
+            // 主日志器挂载的各输出对象，如果没有设置格式，则设置为与日志器相同
             i->m_formatter = m_formatter;
         }
     }
@@ -441,6 +442,7 @@ std::string FileLogAppender::toYamlString() {
 void Logger::addAppender(LogAppender::ptr appender) {
     if(!appender->getFormatter()) {
         // 如果当前appender的格式为空，就把Logger自己的格式指针给appender
+        // 该输出目标有格式指针，但仍未设置格式，其 m_hasFormatter 为 false
         appender->m_formatter = m_formatter;
     }
     m_appenders.push_back(appender);
@@ -468,6 +470,7 @@ void Logger::log(LogLevel::Level level, LogEvent::ptr event) {
                 i->log(self, level, event);     // 将事件进行登记
             }
         } else if(m_root) {
+            // 输出对象map为空，则使用默认的 m_root 输出
             m_root->log(level, event);
         }
     }
@@ -495,12 +498,10 @@ void Logger::fatal(LogEvent::ptr event) {
 
 
 LoggerManager::LoggerManager(){
-    m_root.reset(new Logger);
+    m_root.reset(new Logger);       // enable_shared_from_this 里面的函数？
     m_root->addAppender(LogAppender::ptr(new StdoutLogAppender));
 
     m_loggers[m_root->m_name] = m_root;     // m_root初始化完成后放入 LoggerManager 的 map 中
-
-    init();
 }
 
 
@@ -595,6 +596,7 @@ public:
             LogDefine ld;
             if(n["name"].IsScalar()) {
                 ld.name = n["name"].as<std::string>();
+                // 不是IsScalar的话此项就为空？？？
             }
             ld.level = LogLevel::FromString(n["level"].IsDefined() ? n["level"].as<std::string>() : "");
             if(n["formatter"].IsDefined()) {
@@ -660,6 +662,7 @@ public:
                 YAML::Node na;
                 if(a.type == 1) {
                     na["type"] = "FileLogAppender";
+                    na["file"] = a.file;
                 } else if(a.type == 2) {
                     na["type"] = "StdoutLogAppender";
                 }
@@ -688,7 +691,7 @@ sylar::ConfigVar<std::set<LogDefine> >::ptr g_log_defines =
 
 // main 函数之前执行，全局对象！全局对象在main函数之前构造，其在构建时会调用其构造函数
 // 可在其构造函数内加一些事件
-
+// 是否有待提高？
 struct LogIniter {
     LogIniter() {
         g_log_defines->addListener(0xF1E231, [](const std::set<LogDefine>& old_value,
@@ -747,9 +750,7 @@ struct LogIniter {
 
 static LogIniter __log_init;
 
-void LoggerManager::init() {
-
-}
-
+//void LoggerManager::init() {
+//}
 }
 

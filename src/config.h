@@ -387,7 +387,5 @@ private:
         return s_datas;
     }
 };
-
 }
-
 #endif

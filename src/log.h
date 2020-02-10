@@ -17,7 +17,7 @@
     if(logger->getLevel() <= level) \
         sylar::LogEventWrap(sylar::LogEvent::ptr(new sylar::LogEvent(logger, level, \
                         __FILE__, __LINE__, 0, sylar::GetThreadId(), \
-                        sylar::GetFiberId(), time(0)))).getSS()
+                        sylar::GetFiberId(), time(nullptr)))).getSS()
 
 #define SYLAR_LOG_DEBUG(logger) SYLAR_LOG_LEVEL(logger, sylar::LogLevel::DEBUG)
 #define SYLAR_LOG_INFO(logger) SYLAR_LOG_LEVEL(logger, sylar::LogLevel::INFO)
@@ -29,7 +29,7 @@
     if(logger->getLevel() <= level) \
         sylar::LogEventWrap(sylar::LogEvent::ptr(new sylar::LogEvent(logger, level, \
                         __FILE__, __LINE__, 0, sylar::GetThreadId(), \
-                        sylar::GetFiberId(), time(0)))).getEvent()->format(fmt, __VA_ARGS__)
+                        sylar::GetFiberId(), time(nullptr)))).getEvent()->format(fmt, __VA_ARGS__)
 
 #define SYLAR_LOG_FMT_DEBUG(logger, fmt, ...) SYLAR_LOG_FMT_LEVEL(logger, sylar::LogLevel::DEBUG, fmt, __VA_ARGS__)
 #define SYLAR_LOG_FMT_INFO(logger, fmt, ...) SYLAR_LOG_FMT_LEVEL(logger, sylar::LogLevel::INFO, fmt, __VA_ARGS__)
@@ -101,7 +101,6 @@ private:
 
 class LogEventWrap {
     // 就拿来存储LogEvent的智能指针
-    
 public:
     LogEventWrap(LogEvent::ptr e);
     ~LogEventWrap();
@@ -119,8 +118,12 @@ public:
 
     // %t   %thread_id %m%n
     std::string format(std::shared_ptr<Logger> logger, LogLevel::Level level, LogEvent::ptr event);
-    // 日志解析子模块
+    void init();                                // 构造函数中调用，解析pattern
+    bool isError() const { return m_Error;}     // 给定模板是否有错
+    const std::string getFormatter() const { return m_pattern;}
+
 public:
+    // 日志解析子模块
     class FormatItem {
     public:
         typedef std::shared_ptr<FormatItem> ptr;    // 智能指针
@@ -130,9 +133,6 @@ public:
                 LogLevel::Level level, LogEvent::ptr event) = 0;
     };
 
-    void init();                                // 构造函数中调用，解析pattern
-    bool isError() const { return m_Error;}
-    const std::string getFormatter() const { return m_pattern;}
 private:
     // 日志格式模板
     std::string m_pattern;                 
@@ -140,9 +140,6 @@ private:
     std::vector<FormatItem::ptr> m_items;       // 定义很多不同的子类，每个子类负责输出对应的内容
     // 标记在 init 方法中解析的 m_pattern 是否有错误
     bool m_Error = false;
-
-private:
-
 };
 
 
@@ -221,15 +218,14 @@ public:
 
     void setFormatter(LogFormatter::ptr val);
     void setFormatter(const std::string& val);
-
     LogFormatter::ptr getFormatter();
 
     std::string toYamlString();
 private:
     std::string m_name;                         // Logger name
     LogLevel::Level m_level;                    // log level
-    std::list<LogAppender::ptr> m_appenders;    // Appender set
-    LogFormatter::ptr m_formatter;              // 初始化时使用
+    std::list<LogAppender::ptr> m_appenders;    // 输出对象 
+    LogFormatter::ptr m_formatter;              // 日志器的格式 
     Logger::ptr m_root;                         // 主日志器
 };
 
@@ -239,7 +235,7 @@ public:
     LoggerManager();
     Logger::ptr getLogger(const std::string& name);
 
-    void init();                    // 方便从配置文件直接读入
+//    void init();                    // 方便从配置文件直接读入
 
     Logger::ptr getRoot() const { return m_root;} 
     std::string toYamlString();
