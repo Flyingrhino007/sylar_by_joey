@@ -25,6 +25,9 @@ FileLogAppender	log.h	/^class FileLogAppender : public LogAppender {$/;"	c	names
 FilenameFormatItem	log.cpp	/^    FilenameFormatItem(const std::string& str = "") {}$/;"	f	class:sylar::FilenameFormatItem	access:public	signature:(const std::string& str = �)
 FilenameFormatItem	log.cpp	/^class FilenameFormatItem : public  LogFormatter::FormatItem {$/;"	c	namespace:sylar	file:	inherits:LogFormatter::FormatItem
 FormatItem	log.h	/^    class FormatItem {$/;"	c	class:sylar::LogFormatter	access:public
+FromString	log.cpp	/^LogLevel::Level LogLevel::FromString(const std::string& str) {$/;"	f	class:sylar::LogLevel	signature:(const std::string& str)
+FromString	log.h	/^    static LogLevel::Level FromString(const std::string& str);$/;"	p	class:sylar::LogLevel	access:public	signature:(const std::string& str)
+GetDatas	config.h	/^    static ConfigVarMap& GetDatas() {$/;"	f	class:sylar::Config	access:private	signature:()
 GetFiberId	util.cc	/^uint32_t GetFiberId() {$/;"	f	namespace:sylar	signature:()
 GetFiberId	util.h	/^uint32_t GetFiberId();$/;"	p	namespace:sylar	signature:()
 GetInstance	singleton.h	/^    static T* GetInstance() {$/;"	f	class:sylar::Singleton	access:public	signature:()
@@ -48,6 +51,8 @@ LexicalCast	config.h	/^class LexicalCast<std::string, std::vector<T> > {$/;"	c	n
 LexicalCast	config.h	/^class LexicalCast<std::unordered_map<std::string, T>, std::string> {$/;"	c	namespace:sylar
 LexicalCast	config.h	/^class LexicalCast<std::unordered_set<T>, std::string> {$/;"	c	namespace:sylar
 LexicalCast	config.h	/^class LexicalCast<std::vector<T>, std::string> {$/;"	c	namespace:sylar
+LexicalCast	log.cpp	/^class LexicalCast<std::set<LogDefine>, std::string> {$/;"	c	namespace:sylar	file:
+LexicalCast	log.cpp	/^class LexicalCast<std::string, std::set<LogDefine> > {$/;"	c	namespace:sylar	file:
 LineFormatItem	log.cpp	/^    LineFormatItem(const std::string& str = "") {}$/;"	f	class:sylar::LineFormatItem	access:public	signature:(const std::string& str = �)
 LineFormatItem	log.cpp	/^class LineFormatItem : public  LogFormatter::FormatItem {$/;"	c	namespace:sylar	file:	inherits:LogFormatter::FormatItem
 ListAllMember	config.cc	/^static void ListAllMember(const std::string& prefix,$/;"	f	namespace:sylar	signature:(const std::string& prefix, const YAML::Node& node, std::list<std::pair<std::string, const YAML::Node> >& output)
@@ -114,18 +119,21 @@ UNKNOW	log.h	/^        UNKNOW = 0,$/;"	e	enum:sylar::LogLevel::Level
 WARN	log.h	/^        WARN = 3,$/;"	e	enum:sylar::LogLevel::Level
 XX	log.cpp	16;"	d	file:
 XX	log.cpp	26;"	d	file:
-XX	log.cpp	280;"	d	file:
-XX	log.cpp	294;"	d	file:
+XX	log.cpp	301;"	d	file:
+XX	log.cpp	315;"	d	file:
+XX	log.cpp	34;"	d	file:
+XX	log.cpp	51;"	d	file:
 _CONFIG_H	config.h	9;"	d
 _SINGLETON_H	singleton.h	9;"	d
 _SYLAR_UTIL_H	util.h	9;"	d
 __SYLAR_LOG_H__	log.h	2;"	d
+__log_init	log.cpp	/^static LogIniter __log_init;$/;"	m	namespace:sylar	file:
 addAppender	log.cpp	/^void Logger::addAppender(LogAppender::ptr appender) {$/;"	f	class:sylar::Logger	signature:(LogAppender::ptr appender)
 addAppender	log.h	/^    void addAppender(LogAppender::ptr appender);$/;"	p	class:sylar::Logger	access:public	signature:(LogAppender::ptr appender)
 addListener	config.h	/^    void addListener(uint64_t key, on_change_cb cb) {$/;"	f	class:sylar::ConfigVar	access:public	signature:(uint64_t key, on_change_cb cb)
 appenders	log.cpp	/^    std::vector<LogAppenderDefine> appenders;$/;"	m	struct:sylar::LogDefine	file:	access:public
 clearAppenders	log.cpp	/^void Logger::clearAppenders() {$/;"	f	class:sylar::Logger	signature:()
-clearAppenders	log.h	/^    void clearAppenders();$/;"	p	class:sylar::Logger	access:public	signature:()
+clearAppenders	log.h	/^    void clearAppenders();                      \/\/ 清空输出地$/;"	p	class:sylar::Logger	access:public	signature:()
 clearListener	config.h	/^    void clearListener() {$/;"	f	class:sylar::ConfigVar	access:public	signature:()
 deListener	config.h	/^    void deListener(uint64_t key) {$/;"	f	class:sylar::ConfigVar	access:public	signature:(uint64_t key)
 debug	log.cpp	/^void Logger::debug(LogEvent::ptr event) {$/;"	f	class:sylar::Logger	signature:(LogEvent::ptr event)
@@ -147,7 +155,7 @@ format	log.h	/^    void format(const char* fmt, va_list al);$/;"	p	class:sylar::
 formatter	log.cpp	/^    std::string formatter;$/;"	m	struct:sylar::LogAppenderDefine	file:	access:public
 formatter	log.cpp	/^    std::string formatter;$/;"	m	struct:sylar::LogDefine	file:	access:public
 fromString	config.h	/^    virtual bool fromString(const std::string& vl) = 0;$/;"	p	class:sylar::ConfigVarBase	access:public	signature:(const std::string& vl)
-g_log_defines	log.cpp	/^sylar::ConfigVar<std::set<LogDefine> > g_log_defines = $/;"	m	namespace:sylar	file:
+g_log_defines	log.cpp	/^sylar::ConfigVar<std::set<LogDefine> >::ptr g_log_defines = $/;"	m	namespace:sylar	file:
 getContent	log.h	/^    std::string getContent() const { return m_ss.str();}$/;"	f	class:sylar::LogEvent	access:public	signature:() const
 getDescription	config.h	/^    const std::string& getDescription() const { return m_description;}$/;"	f	class:sylar::ConfigVarBase	access:public	signature:() const
 getElapse	log.h	/^    uint32_t getElapse() const { return m_elapse;}$/;"	f	class:sylar::LogEvent	access:public	signature:() const
@@ -157,6 +165,7 @@ getFile	log.h	/^    const char* getFile() const { return m_file;}$/;"	f	class:sy
 getFormatter	log.cpp	/^LogFormatter::ptr Logger::getFormatter() {$/;"	f	class:sylar::Logger	signature:()
 getFormatter	log.h	/^    LogFormatter::ptr getFormatter() const { return m_formatter;}$/;"	f	class:sylar::LogAppender	access:public	signature:() const
 getFormatter	log.h	/^    LogFormatter::ptr getFormatter();$/;"	p	class:sylar::Logger	access:public	signature:()
+getFormatter	log.h	/^    const std::string getFormatter() const { return m_pattern;}$/;"	f	class:sylar::LogFormatter	access:public	signature:() const
 getLevel	log.h	/^    LogLevel::Level getLevel() const {return m_level;}$/;"	f	class:sylar::Logger	access:public	signature:() const
 getLevel	log.h	/^    LogLevel::Level getLevel() { return m_level;}$/;"	f	class:sylar::LogEvent	access:public	signature:()
 getLine	log.h	/^    int32_t getLine() const { return m_line;}$/;"	f	class:sylar::LogEvent	access:public	signature:() const
@@ -178,22 +187,22 @@ info	log.cpp	/^void Logger::info(LogEvent::ptr event) {$/;"	f	class:sylar::Logge
 info	log.h	/^    void info(LogEvent::ptr event);$/;"	p	class:sylar::Logger	access:public	signature:(LogEvent::ptr event)
 init	log.cpp	/^void LogFormatter::init() {$/;"	f	class:sylar::LogFormatter	signature:()
 init	log.cpp	/^void LoggerManager::init() {$/;"	f	class:sylar::LoggerManager	signature:()
-init	log.h	/^    void init();                                \/\/ 解析pattern$/;"	p	class:sylar::LogFormatter	access:public	signature:()
+init	log.h	/^    void init();                                \/\/ 构造函数中调用，解析pattern$/;"	p	class:sylar::LogFormatter	access:public	signature:()
 init	log.h	/^    void init();                    \/\/ 方便从配置文件直接读入$/;"	p	class:sylar::LoggerManager	access:public	signature:()
-isError	log.h	/^    bool isError() const { return m_error;}$/;"	f	class:sylar::LogFormatter	access:public	signature:() const
-level	log.cpp	/^    LogLevel::Level level = LogLevel::UNKOWN;$/;"	m	struct:sylar::LogAppenderDefine	file:	access:public
-level	log.cpp	/^    LogLevel::Level level = LogLevel::UNKOWN;$/;"	m	struct:sylar::LogDefine	file:	access:public
+isError	log.h	/^    bool isError() const { return m_Error;}$/;"	f	class:sylar::LogFormatter	access:public	signature:() const
+level	log.cpp	/^    LogLevel::Level level = LogLevel::UNKNOW;$/;"	m	struct:sylar::LogAppenderDefine	file:	access:public
+level	log.cpp	/^    LogLevel::Level level = LogLevel::UNKNOW;$/;"	m	struct:sylar::LogDefine	file:	access:public
 log	log.cpp	/^void FileLogAppender::log(std::shared_ptr<Logger> logger, LogLevel::Level level, LogEvent::ptr event) {$/;"	f	class:sylar::FileLogAppender	signature:(std::shared_ptr<Logger> logger, LogLevel::Level level, LogEvent::ptr event)
 log	log.cpp	/^void Logger::log(LogLevel::Level level, LogEvent::ptr event) {$/;"	f	class:sylar::Logger	signature:(LogLevel::Level level, LogEvent::ptr event)
 log	log.cpp	/^void StdoutLogAppender::log(std::shared_ptr<Logger> logger, LogLevel::Level level, LogEvent::ptr event) {$/;"	f	class:sylar::StdoutLogAppender	signature:(std::shared_ptr<Logger> logger, LogLevel::Level level, LogEvent::ptr event)
 log	log.h	/^    virtual void log(std::shared_ptr<Logger> logger, LogLevel::Level level, LogEvent::ptr event) = 0;$/;"	p	class:sylar::LogAppender	access:public	signature:(std::shared_ptr<Logger> logger, LogLevel::Level level, LogEvent::ptr event)
 log	log.h	/^    void log(LogLevel::Level level, LogEvent::ptr event);$/;"	p	class:sylar::Logger	access:public	signature:(LogLevel::Level level, LogEvent::ptr event)
+m_Error	log.h	/^    bool m_Error = false;$/;"	m	class:sylar::LogFormatter	access:private
 m_appenders	log.h	/^    std::list<LogAppender::ptr> m_appenders;    \/\/ Appender set$/;"	m	class:sylar::Logger	access:private
 m_cbs	config.h	/^    std::map<uint64_t, on_change_cb> m_cbs;$/;"	m	class:sylar::ConfigVar	access:private
 m_content	log.h	/^    std::string m_content;$/;"	m	class:sylar::LogEvent	access:private
 m_description	config.h	/^    std::string m_description;  \/\/ 描述文字$/;"	m	class:sylar::ConfigVarBase	access:protected
 m_elapse	log.h	/^    uint32_t m_elapse = 0;          \/\/ milliseconds since program start$/;"	m	class:sylar::LogEvent	access:private
-m_error	log.h	/^    bool m_error = false;$/;"	m	class:sylar::LogFormatter	access:private
 m_event	log.h	/^    LogEvent::ptr m_event;$/;"	m	class:sylar::LogEventWrap	access:private
 m_fiberId	log.h	/^    uint32_t m_fiberId = 0;         \/\/ coroutine id$/;"	m	class:sylar::LogEvent	access:private
 m_file	log.h	/^    const char* m_file = nullptr;   \/\/ file name$/;"	m	class:sylar::LogEvent	access:private
@@ -208,12 +217,12 @@ m_level	log.h	/^    LogLevel::Level m_level = LogLevel::DEBUG;      \/\/ 初始�
 m_level	log.h	/^    LogLevel::Level m_level;                    \/\/ log level$/;"	m	class:sylar::Logger	access:private
 m_level	log.h	/^    LogLevel::Level m_level;$/;"	m	class:sylar::LogEvent	access:private
 m_line	log.h	/^    int32_t m_line = 0;             \/\/ line number$/;"	m	class:sylar::LogEvent	access:private
-m_logger	log.h	/^    Logger::ptr m_logger;$/;"	m	class:sylar::Logger	access:private
-m_logger	log.h	/^    std::map<std::string, Logger::ptr> m_logger;$/;"	m	class:sylar::LoggerManager	access:private
 m_logger	log.h	/^    std::shared_ptr<Logger> m_logger;$/;"	m	class:sylar::LogEvent	access:private
+m_loggers	log.h	/^    std::map<std::string, Logger::ptr> m_loggers;$/;"	m	class:sylar::LoggerManager	access:private
 m_name	config.h	/^    std::string m_name;         \/\/ 命名$/;"	m	class:sylar::ConfigVarBase	access:protected
 m_name	log.h	/^    std::string m_name;                         \/\/ Logger name$/;"	m	class:sylar::Logger	access:private
 m_pattern	log.h	/^    std::string m_pattern;                 $/;"	m	class:sylar::LogFormatter	access:private
+m_root	log.h	/^    Logger::ptr m_root;                         \/\/ 主日志器$/;"	m	class:sylar::Logger	access:private
 m_root	log.h	/^    Logger::ptr m_root;$/;"	m	class:sylar::LoggerManager	access:private
 m_ss	log.h	/^    std::stringstream m_ss;$/;"	m	class:sylar::LogEvent	access:private
 m_string	log.cpp	/^    std::string m_string;$/;"	m	class:sylar::StringFormatItem	file:	access:private
@@ -236,9 +245,13 @@ operator ()	config.h	/^    std::string operator()(const std::vector<T>& v) {$/;"
 operator ()	config.h	/^    std::unordered_map<std::string, T> operator()(const std::string& v) {$/;"	f	class:sylar::LexicalCast	access:public	signature:(const std::string& v)
 operator ()	config.h	/^    std::unordered_set<T> operator()(const std::string& v) {$/;"	f	class:sylar::LexicalCast	access:public	signature:(const std::string& v)
 operator ()	config.h	/^    std::vector<T> operator()(const std::string& v) {$/;"	f	class:sylar::LexicalCast	access:public	signature:(const std::string& v)
+operator ()	log.cpp	/^    std::set<LogDefine> operator()(const std::string& v) {$/;"	f	class:sylar::LexicalCast	access:public	signature:(const std::string& v)
+operator ()	log.cpp	/^    std::string operator()(const std::set<LogDefine>& v) {$/;"	f	class:sylar::LexicalCast	access:public	signature:(const std::set<LogDefine>& v)
 operator <	log.cpp	/^    bool operator<(const LogDefine& oth) const {$/;"	f	struct:sylar::LogDefine	access:public	signature:(const LogDefine& oth) const
 operator ==	log.cpp	/^    bool operator==(const LogAppenderDefine& oth) const {$/;"	f	struct:sylar::LogAppenderDefine	access:public	signature:(const LogAppenderDefine& oth) const
 operator ==	log.cpp	/^    bool operator==(const LogDefine& oth) const {$/;"	f	struct:sylar::LogDefine	access:public	signature:(const LogDefine& oth) const
+override	log.h	/^    std::string toYamlString() override;$/;"	m	class:sylar::FileLogAppender	access:public
+override	log.h	/^    std::string toYamlString() override;$/;"	m	class:sylar::StdoutLogAppender	access:public
 override	log.h	/^    void log(std::shared_ptr<Logger> logger, LogLevel::Level level, LogEvent::ptr event) override;   \/\/ override描述从虚基类继承出来的$/;"	m	class:sylar::StdoutLogAppender	access:public
 override	log.h	/^    void log(std::shared_ptr<Logger> logger, LogLevel::Level level, LogEvent::ptr event) override;$/;"	m	class:sylar::FileLogAppender	access:public
 ptr	config.h	/^    typedef std::shared_ptr<ConfigVar> ptr;$/;"	t	class:sylar::ConfigVar	access:public
@@ -252,12 +265,10 @@ ptr	log.h	/^    typedef std::shared_ptr<Logger> ptr;$/;"	t	class:sylar::Logger	a
 ptr	log.h	/^    typedef std::shared_ptr<StdoutLogAppender> ptr;$/;"	t	class:sylar::StdoutLogAppender	access:public
 reopen	log.cpp	/^bool FileLogAppender::reopen() {$/;"	f	class:sylar::FileLogAppender	signature:()
 reopen	log.h	/^    bool reopen();$/;"	p	class:sylar::FileLogAppender	access:public	signature:()
-s_datas	config.cc	/^Config::ConfigVarMap Config::s_datas;$/;"	m	class:sylar::Config	file:
-s_datas	config.h	/^    static ConfigVarMap s_datas;$/;"	m	class:sylar::Config	access:private
 setFormatter	log.cpp	/^void Logger::setFormatter(LogFormatter::ptr val) {$/;"	f	class:sylar::Logger	signature:(LogFormatter::ptr val)
 setFormatter	log.cpp	/^void Logger::setFormatter(const std::string& val) {$/;"	f	class:sylar::Logger	signature:(const std::string& val)
 setFormatter	log.h	/^    void setFormatter(LogFormatter::ptr val) { m_formatter = val;}$/;"	f	class:sylar::LogAppender	access:public	signature:(LogFormatter::ptr val)
-setFormatter	log.h	/^    void setFormatter(LogFormatter::tr val);$/;"	p	class:sylar::Logger	access:public	signature:(LogFormatter::tr val)
+setFormatter	log.h	/^    void setFormatter(LogFormatter::ptr val);$/;"	p	class:sylar::Logger	access:public	signature:(LogFormatter::ptr val)
 setFormatter	log.h	/^    void setFormatter(const std::string& val);$/;"	p	class:sylar::Logger	access:public	signature:(const std::string& val)
 setLevel	log.h	/^    void setLevel(LogLevel::Level val) { m_level = val;}$/;"	f	class:sylar::LogAppender	access:public	signature:(LogLevel::Level val)
 setLevel	log.h	/^    void setLevel(LogLevel::Level val) {m_level = val;}$/;"	f	class:sylar::Logger	access:public	signature:(LogLevel::Level val)
@@ -265,20 +276,19 @@ setValue	config.h	/^    void setValue(const T& v) { $/;"	f	class:sylar::ConfigVa
 sylar	config.cc	/^namespace sylar {$/;"	n	file:
 sylar	config.h	/^namespace sylar {$/;"	n
 sylar	log.cpp	/^namespace sylar {$/;"	n	file:
-sylar	log.h	/^namespace sylar {$/;"	n
+sylar	log.h	/^namespace sylar { $/;"	n
 sylar	singleton.h	/^namespace sylar {$/;"	n
 sylar	util.cc	/^namespace sylar {$/;"	n	file:
 sylar	util.h	/^namespace sylar {$/;"	n
 sylar::Config	config.h	/^class Config {$/;"	c	namespace:sylar
 sylar::Config::ConfigVarMap	config.h	/^    typedef std::map<std::string, ConfigVarBase::ptr> ConfigVarMap;$/;"	t	class:sylar::Config	access:public
+sylar::Config::GetDatas	config.h	/^    static ConfigVarMap& GetDatas() {$/;"	f	class:sylar::Config	access:private	signature:()
 sylar::Config::LoadFromYaml	config.cc	/^void Config::LoadFromYaml(const YAML::Node& root) {$/;"	f	class:sylar::Config	signature:(const YAML::Node& root)
 sylar::Config::LoadFromYaml	config.h	/^    static void LoadFromYaml(const YAML::Node& root);$/;"	p	class:sylar::Config	access:public	signature:(const YAML::Node& root)
 sylar::Config::Lookup	config.h	/^    static typename ConfigVar<T>::ptr Lookup(const std::string& name$/;"	f	class:sylar::Config	access:public	signature:(const std::string& name , const T& default_value, const std::string& description = �)
 sylar::Config::Lookup	config.h	/^    static typename ConfigVar<T>::ptr Lookup(const std::string& name) {$/;"	f	class:sylar::Config	access:public	signature:(const std::string& name)
 sylar::Config::LookupBase	config.cc	/^ConfigVarBase::ptr Config::LookupBase(const std::string& name) {$/;"	f	class:sylar::Config	signature:(const std::string& name)
 sylar::Config::LookupBase	config.h	/^    static ConfigVarBase::ptr LookupBase(const std::string& name);$/;"	p	class:sylar::Config	access:public	signature:(const std::string& name)
-sylar::Config::s_datas	config.cc	/^Config::ConfigVarMap Config::s_datas;$/;"	m	class:sylar::Config	file:
-sylar::Config::s_datas	config.h	/^    static ConfigVarMap s_datas;$/;"	m	class:sylar::Config	access:private
 sylar::ConfigVar	config.h	/^class ConfigVar : public ConfigVarBase {$/;"	c	namespace:sylar	inherits:ConfigVarBase
 sylar::ConfigVar::ConfigVar	config.h	/^    ConfigVar(const std::string& name$/;"	f	class:sylar::ConfigVar	access:public	signature:(const std::string& name , const T& default_valie , const std::string& description = �)
 sylar::ConfigVar::addListener	config.h	/^    void addListener(uint64_t key, on_change_cb cb) {$/;"	f	class:sylar::ConfigVar	access:public	signature:(uint64_t key, on_change_cb cb)
@@ -316,10 +326,12 @@ sylar::FileLogAppender::log	log.cpp	/^void FileLogAppender::log(std::shared_ptr<
 sylar::FileLogAppender::m_filename	log.h	/^    std::string m_filename;$/;"	m	class:sylar::FileLogAppender	access:private
 sylar::FileLogAppender::m_filestream	log.h	/^    std::ofstream m_filestream;$/;"	m	class:sylar::FileLogAppender	access:private
 sylar::FileLogAppender::m_latTime	log.h	/^    uint64_t m_latTime = 0;$/;"	m	class:sylar::FileLogAppender	access:private
+sylar::FileLogAppender::override	log.h	/^    std::string toYamlString() override;$/;"	m	class:sylar::FileLogAppender	access:public
 sylar::FileLogAppender::override	log.h	/^    void log(std::shared_ptr<Logger> logger, LogLevel::Level level, LogEvent::ptr event) override;$/;"	m	class:sylar::FileLogAppender	access:public
 sylar::FileLogAppender::ptr	log.h	/^    typedef std::shared_ptr<FileLogAppender> ptr;$/;"	t	class:sylar::FileLogAppender	access:public
 sylar::FileLogAppender::reopen	log.cpp	/^bool FileLogAppender::reopen() {$/;"	f	class:sylar::FileLogAppender	signature:()
 sylar::FileLogAppender::reopen	log.h	/^    bool reopen();$/;"	p	class:sylar::FileLogAppender	access:public	signature:()
+sylar::FileLogAppender::toYamlString	log.cpp	/^std::string FileLogAppender::toYamlString() {$/;"	f	class:sylar::FileLogAppender	signature:()
 sylar::FilenameFormatItem	log.cpp	/^class FilenameFormatItem : public  LogFormatter::FormatItem {$/;"	c	namespace:sylar	file:	inherits:LogFormatter::FormatItem
 sylar::FilenameFormatItem::FilenameFormatItem	log.cpp	/^    FilenameFormatItem(const std::string& str = "") {}$/;"	f	class:sylar::FilenameFormatItem	access:public	signature:(const std::string& str = �)
 sylar::GetFiberId	util.cc	/^uint32_t GetFiberId() {$/;"	f	namespace:sylar	signature:()
@@ -341,6 +353,8 @@ sylar::LexicalCast	config.h	/^class LexicalCast<std::string, std::vector<T> > {$
 sylar::LexicalCast	config.h	/^class LexicalCast<std::unordered_map<std::string, T>, std::string> {$/;"	c	namespace:sylar
 sylar::LexicalCast	config.h	/^class LexicalCast<std::unordered_set<T>, std::string> {$/;"	c	namespace:sylar
 sylar::LexicalCast	config.h	/^class LexicalCast<std::vector<T>, std::string> {$/;"	c	namespace:sylar
+sylar::LexicalCast	log.cpp	/^class LexicalCast<std::set<LogDefine>, std::string> {$/;"	c	namespace:sylar	file:
+sylar::LexicalCast	log.cpp	/^class LexicalCast<std::string, std::set<LogDefine> > {$/;"	c	namespace:sylar	file:
 sylar::LexicalCast::operator ()	config.h	/^    T operator() (const F& f) {$/;"	f	class:sylar::LexicalCast	access:public	signature:(const F& f)
 sylar::LexicalCast::operator ()	config.h	/^    std::list<T> operator()(const std::string& v) {$/;"	f	class:sylar::LexicalCast	access:public	signature:(const std::string& v)
 sylar::LexicalCast::operator ()	config.h	/^    std::map<std::string, T> operator()(const std::string& v) {$/;"	f	class:sylar::LexicalCast	access:public	signature:(const std::string& v)
@@ -354,6 +368,8 @@ sylar::LexicalCast::operator ()	config.h	/^    std::string operator()(const std:
 sylar::LexicalCast::operator ()	config.h	/^    std::unordered_map<std::string, T> operator()(const std::string& v) {$/;"	f	class:sylar::LexicalCast	access:public	signature:(const std::string& v)
 sylar::LexicalCast::operator ()	config.h	/^    std::unordered_set<T> operator()(const std::string& v) {$/;"	f	class:sylar::LexicalCast	access:public	signature:(const std::string& v)
 sylar::LexicalCast::operator ()	config.h	/^    std::vector<T> operator()(const std::string& v) {$/;"	f	class:sylar::LexicalCast	access:public	signature:(const std::string& v)
+sylar::LexicalCast::operator ()	log.cpp	/^    std::set<LogDefine> operator()(const std::string& v) {$/;"	f	class:sylar::LexicalCast	access:public	signature:(const std::string& v)
+sylar::LexicalCast::operator ()	log.cpp	/^    std::string operator()(const std::set<LogDefine>& v) {$/;"	f	class:sylar::LexicalCast	access:public	signature:(const std::set<LogDefine>& v)
 sylar::LineFormatItem	log.cpp	/^class LineFormatItem : public  LogFormatter::FormatItem {$/;"	c	namespace:sylar	file:	inherits:LogFormatter::FormatItem
 sylar::LineFormatItem::LineFormatItem	log.cpp	/^    LineFormatItem(const std::string& str = "") {}$/;"	f	class:sylar::LineFormatItem	access:public	signature:(const std::string& str = �)
 sylar::ListAllMember	config.cc	/^static void ListAllMember(const std::string& prefix,$/;"	f	namespace:sylar	signature:(const std::string& prefix, const YAML::Node& node, std::list<std::pair<std::string, const YAML::Node> >& output)
@@ -365,17 +381,18 @@ sylar::LogAppender::m_level	log.h	/^    LogLevel::Level m_level = LogLevel::DEBU
 sylar::LogAppender::ptr	log.h	/^    typedef std::shared_ptr<LogAppender> ptr;$/;"	t	class:sylar::LogAppender	access:public
 sylar::LogAppender::setFormatter	log.h	/^    void setFormatter(LogFormatter::ptr val) { m_formatter = val;}$/;"	f	class:sylar::LogAppender	access:public	signature:(LogFormatter::ptr val)
 sylar::LogAppender::setLevel	log.h	/^    void setLevel(LogLevel::Level val) { m_level = val;}$/;"	f	class:sylar::LogAppender	access:public	signature:(LogLevel::Level val)
+sylar::LogAppender::toYamlString	log.h	/^    virtual std::string toYamlString() = 0;$/;"	p	class:sylar::LogAppender	access:public	signature:()
 sylar::LogAppender::~LogAppender	log.h	/^    virtual ~LogAppender() {}$/;"	f	class:sylar::LogAppender	access:public	signature:()
 sylar::LogAppenderDefine	log.cpp	/^struct LogAppenderDefine {$/;"	s	namespace:sylar	file:
 sylar::LogAppenderDefine::file	log.cpp	/^    std::string file;$/;"	m	struct:sylar::LogAppenderDefine	file:	access:public
 sylar::LogAppenderDefine::formatter	log.cpp	/^    std::string formatter;$/;"	m	struct:sylar::LogAppenderDefine	file:	access:public
-sylar::LogAppenderDefine::level	log.cpp	/^    LogLevel::Level level = LogLevel::UNKOWN;$/;"	m	struct:sylar::LogAppenderDefine	file:	access:public
+sylar::LogAppenderDefine::level	log.cpp	/^    LogLevel::Level level = LogLevel::UNKNOW;$/;"	m	struct:sylar::LogAppenderDefine	file:	access:public
 sylar::LogAppenderDefine::operator ==	log.cpp	/^    bool operator==(const LogAppenderDefine& oth) const {$/;"	f	struct:sylar::LogAppenderDefine	access:public	signature:(const LogAppenderDefine& oth) const
 sylar::LogAppenderDefine::type	log.cpp	/^    int type = 0;   \/\/ 1 File, 2 Stdout$/;"	m	struct:sylar::LogAppenderDefine	file:	access:public
 sylar::LogDefine	log.cpp	/^struct LogDefine {$/;"	s	namespace:sylar	file:
 sylar::LogDefine::appenders	log.cpp	/^    std::vector<LogAppenderDefine> appenders;$/;"	m	struct:sylar::LogDefine	file:	access:public
 sylar::LogDefine::formatter	log.cpp	/^    std::string formatter;$/;"	m	struct:sylar::LogDefine	file:	access:public
-sylar::LogDefine::level	log.cpp	/^    LogLevel::Level level = LogLevel::UNKOWN;$/;"	m	struct:sylar::LogDefine	file:	access:public
+sylar::LogDefine::level	log.cpp	/^    LogLevel::Level level = LogLevel::UNKNOW;$/;"	m	struct:sylar::LogDefine	file:	access:public
 sylar::LogDefine::name	log.cpp	/^    std::string name;$/;"	m	struct:sylar::LogDefine	file:	access:public
 sylar::LogDefine::operator <	log.cpp	/^    bool operator<(const LogDefine& oth) const {$/;"	f	struct:sylar::LogDefine	access:public	signature:(const LogDefine& oth) const
 sylar::LogDefine::operator ==	log.cpp	/^    bool operator==(const LogDefine& oth) const {$/;"	f	struct:sylar::LogDefine	access:public	signature:(const LogDefine& oth) const
@@ -425,10 +442,11 @@ sylar::LogFormatter::LogFormatter	log.cpp	/^LogFormatter::LogFormatter(const std
 sylar::LogFormatter::LogFormatter	log.h	/^    LogFormatter(const std::string& pattern);       \/\/ 实例化的时候输入pattern$/;"	p	class:sylar::LogFormatter	access:public	signature:(const std::string& pattern)
 sylar::LogFormatter::format	log.cpp	/^std::string LogFormatter::format (std::shared_ptr<Logger> logger, LogLevel::Level level, LogEvent::ptr event) {$/;"	f	class:sylar::LogFormatter	signature:(std::shared_ptr<Logger> logger, LogLevel::Level level, LogEvent::ptr event)
 sylar::LogFormatter::format	log.h	/^    std::string format(std::shared_ptr<Logger> logger, LogLevel::Level level, LogEvent::ptr event);$/;"	p	class:sylar::LogFormatter	access:public	signature:(std::shared_ptr<Logger> logger, LogLevel::Level level, LogEvent::ptr event)
+sylar::LogFormatter::getFormatter	log.h	/^    const std::string getFormatter() const { return m_pattern;}$/;"	f	class:sylar::LogFormatter	access:public	signature:() const
 sylar::LogFormatter::init	log.cpp	/^void LogFormatter::init() {$/;"	f	class:sylar::LogFormatter	signature:()
-sylar::LogFormatter::init	log.h	/^    void init();                                \/\/ 解析pattern$/;"	p	class:sylar::LogFormatter	access:public	signature:()
-sylar::LogFormatter::isError	log.h	/^    bool isError() const { return m_error;}$/;"	f	class:sylar::LogFormatter	access:public	signature:() const
-sylar::LogFormatter::m_error	log.h	/^    bool m_error = false;$/;"	m	class:sylar::LogFormatter	access:private
+sylar::LogFormatter::init	log.h	/^    void init();                                \/\/ 构造函数中调用，解析pattern$/;"	p	class:sylar::LogFormatter	access:public	signature:()
+sylar::LogFormatter::isError	log.h	/^    bool isError() const { return m_Error;}$/;"	f	class:sylar::LogFormatter	access:public	signature:() const
+sylar::LogFormatter::m_Error	log.h	/^    bool m_Error = false;$/;"	m	class:sylar::LogFormatter	access:private
 sylar::LogFormatter::m_items	log.h	/^    std::vector<FormatItem::ptr> m_items;       \/\/ 定义很多不同的子类，每个子类负责输出对应的内容$/;"	m	class:sylar::LogFormatter	access:private
 sylar::LogFormatter::m_pattern	log.h	/^    std::string m_pattern;                 $/;"	m	class:sylar::LogFormatter	access:private
 sylar::LogFormatter::ptr	log.h	/^    typedef std::shared_ptr<LogFormatter> ptr;$/;"	t	class:sylar::LogFormatter	access:public
@@ -438,6 +456,8 @@ sylar::LogLevel	log.h	/^class LogLevel {$/;"	c	namespace:sylar
 sylar::LogLevel::DEBUG	log.h	/^        DEBUG = 1,$/;"	e	enum:sylar::LogLevel::Level
 sylar::LogLevel::ERROR	log.h	/^        ERROR = 4,$/;"	e	enum:sylar::LogLevel::Level
 sylar::LogLevel::FATAL	log.h	/^        FATAL = 5$/;"	e	enum:sylar::LogLevel::Level
+sylar::LogLevel::FromString	log.cpp	/^LogLevel::Level LogLevel::FromString(const std::string& str) {$/;"	f	class:sylar::LogLevel	signature:(const std::string& str)
+sylar::LogLevel::FromString	log.h	/^    static LogLevel::Level FromString(const std::string& str);$/;"	p	class:sylar::LogLevel	access:public	signature:(const std::string& str)
 sylar::LogLevel::INFO	log.h	/^        INFO = 2,$/;"	e	enum:sylar::LogLevel::Level
 sylar::LogLevel::Level	log.h	/^    enum Level {$/;"	g	class:sylar::LogLevel	access:public
 sylar::LogLevel::ToString	log.cpp	/^const char* LogLevel::ToString(LogLevel::Level level) {$/;"	f	class:sylar::LogLevel	signature:(LogLevel::Level level)
@@ -450,7 +470,7 @@ sylar::Logger::Logger	log.h	/^    Logger(const std::string& name = "root");$/;"	
 sylar::Logger::addAppender	log.cpp	/^void Logger::addAppender(LogAppender::ptr appender) {$/;"	f	class:sylar::Logger	signature:(LogAppender::ptr appender)
 sylar::Logger::addAppender	log.h	/^    void addAppender(LogAppender::ptr appender);$/;"	p	class:sylar::Logger	access:public	signature:(LogAppender::ptr appender)
 sylar::Logger::clearAppenders	log.cpp	/^void Logger::clearAppenders() {$/;"	f	class:sylar::Logger	signature:()
-sylar::Logger::clearAppenders	log.h	/^    void clearAppenders();$/;"	p	class:sylar::Logger	access:public	signature:()
+sylar::Logger::clearAppenders	log.h	/^    void clearAppenders();                      \/\/ 清空输出地$/;"	p	class:sylar::Logger	access:public	signature:()
 sylar::Logger::debug	log.cpp	/^void Logger::debug(LogEvent::ptr event) {$/;"	f	class:sylar::Logger	signature:(LogEvent::ptr event)
 sylar::Logger::debug	log.h	/^    void debug(LogEvent::ptr event);$/;"	p	class:sylar::Logger	access:public	signature:(LogEvent::ptr event)
 sylar::Logger::delAppender	log.cpp	/^void Logger::delAppender(LogAppender::ptr appender) {$/;"	f	class:sylar::Logger	signature:(LogAppender::ptr appender)
@@ -470,14 +490,16 @@ sylar::Logger::log	log.h	/^    void log(LogLevel::Level level, LogEvent::ptr eve
 sylar::Logger::m_appenders	log.h	/^    std::list<LogAppender::ptr> m_appenders;    \/\/ Appender set$/;"	m	class:sylar::Logger	access:private
 sylar::Logger::m_formatter	log.h	/^    LogFormatter::ptr m_formatter;              \/\/ 初始化时使用$/;"	m	class:sylar::Logger	access:private
 sylar::Logger::m_level	log.h	/^    LogLevel::Level m_level;                    \/\/ log level$/;"	m	class:sylar::Logger	access:private
-sylar::Logger::m_logger	log.h	/^    Logger::ptr m_logger;$/;"	m	class:sylar::Logger	access:private
 sylar::Logger::m_name	log.h	/^    std::string m_name;                         \/\/ Logger name$/;"	m	class:sylar::Logger	access:private
+sylar::Logger::m_root	log.h	/^    Logger::ptr m_root;                         \/\/ 主日志器$/;"	m	class:sylar::Logger	access:private
 sylar::Logger::ptr	log.h	/^    typedef std::shared_ptr<Logger> ptr;$/;"	t	class:sylar::Logger	access:public
 sylar::Logger::setFormatter	log.cpp	/^void Logger::setFormatter(LogFormatter::ptr val) {$/;"	f	class:sylar::Logger	signature:(LogFormatter::ptr val)
 sylar::Logger::setFormatter	log.cpp	/^void Logger::setFormatter(const std::string& val) {$/;"	f	class:sylar::Logger	signature:(const std::string& val)
-sylar::Logger::setFormatter	log.h	/^    void setFormatter(LogFormatter::tr val);$/;"	p	class:sylar::Logger	access:public	signature:(LogFormatter::tr val)
+sylar::Logger::setFormatter	log.h	/^    void setFormatter(LogFormatter::ptr val);$/;"	p	class:sylar::Logger	access:public	signature:(LogFormatter::ptr val)
 sylar::Logger::setFormatter	log.h	/^    void setFormatter(const std::string& val);$/;"	p	class:sylar::Logger	access:public	signature:(const std::string& val)
 sylar::Logger::setLevel	log.h	/^    void setLevel(LogLevel::Level val) {m_level = val;}$/;"	f	class:sylar::Logger	access:public	signature:(LogLevel::Level val)
+sylar::Logger::toYamlString	log.cpp	/^std::string Logger::toYamlString() {$/;"	f	class:sylar::Logger	signature:()
+sylar::Logger::toYamlString	log.h	/^    std::string toYamlString();$/;"	p	class:sylar::Logger	access:public	signature:()
 sylar::Logger::warn	log.cpp	/^void Logger::warn(LogEvent::ptr event) {$/;"	f	class:sylar::Logger	signature:(LogEvent::ptr event)
 sylar::Logger::warn	log.h	/^    void warn(LogEvent::ptr event);$/;"	p	class:sylar::Logger	access:public	signature:(LogEvent::ptr event)
 sylar::LoggerManager	log.h	/^class LoggerManager {$/;"	c	namespace:sylar
@@ -488,8 +510,10 @@ sylar::LoggerManager::getLogger	log.h	/^    Logger::ptr getLogger(const std::str
 sylar::LoggerManager::getRoot	log.h	/^    Logger::ptr getRoot() const { return m_root;} $/;"	f	class:sylar::LoggerManager	access:public	signature:() const
 sylar::LoggerManager::init	log.cpp	/^void LoggerManager::init() {$/;"	f	class:sylar::LoggerManager	signature:()
 sylar::LoggerManager::init	log.h	/^    void init();                    \/\/ 方便从配置文件直接读入$/;"	p	class:sylar::LoggerManager	access:public	signature:()
-sylar::LoggerManager::m_logger	log.h	/^    std::map<std::string, Logger::ptr> m_logger;$/;"	m	class:sylar::LoggerManager	access:private
+sylar::LoggerManager::m_loggers	log.h	/^    std::map<std::string, Logger::ptr> m_loggers;$/;"	m	class:sylar::LoggerManager	access:private
 sylar::LoggerManager::m_root	log.h	/^    Logger::ptr m_root;$/;"	m	class:sylar::LoggerManager	access:private
+sylar::LoggerManager::toYamlString	log.cpp	/^std::string LoggerManager::toYamlString() {$/;"	f	class:sylar::LoggerManager	signature:()
+sylar::LoggerManager::toYamlString	log.h	/^    std::string toYamlString();$/;"	p	class:sylar::LoggerManager	access:public	signature:()
 sylar::LoggerMgr	log.h	/^typedef sylar::Singleton<LoggerManager> LoggerMgr;$/;"	t	namespace:sylar
 sylar::MessageFormatItem	log.cpp	/^class MessageFormatItem : public  LogFormatter::FormatItem {$/;"	c	namespace:sylar	file:	inherits:LogFormatter::FormatItem
 sylar::MessageFormatItem::MessageFormatItem	log.cpp	/^    MessageFormatItem(const std::string& str = "") {}$/;"	f	class:sylar::MessageFormatItem	access:public	signature:(const std::string& str = �)
@@ -503,8 +527,10 @@ sylar::SingletonPtr	singleton.h	/^class SingletonPtr {$/;"	c	namespace:sylar
 sylar::SingletonPtr::GetInstance	singleton.h	/^    static std::shared_ptr<T> GetInstance() {$/;"	f	class:sylar::SingletonPtr	access:public	signature:()
 sylar::StdoutLogAppender	log.h	/^class StdoutLogAppender : public LogAppender {$/;"	c	namespace:sylar	inherits:LogAppender
 sylar::StdoutLogAppender::log	log.cpp	/^void StdoutLogAppender::log(std::shared_ptr<Logger> logger, LogLevel::Level level, LogEvent::ptr event) {$/;"	f	class:sylar::StdoutLogAppender	signature:(std::shared_ptr<Logger> logger, LogLevel::Level level, LogEvent::ptr event)
+sylar::StdoutLogAppender::override	log.h	/^    std::string toYamlString() override;$/;"	m	class:sylar::StdoutLogAppender	access:public
 sylar::StdoutLogAppender::override	log.h	/^    void log(std::shared_ptr<Logger> logger, LogLevel::Level level, LogEvent::ptr event) override;   \/\/ override描述从虚基类继承出来的$/;"	m	class:sylar::StdoutLogAppender	access:public
 sylar::StdoutLogAppender::ptr	log.h	/^    typedef std::shared_ptr<StdoutLogAppender> ptr;$/;"	t	class:sylar::StdoutLogAppender	access:public
+sylar::StdoutLogAppender::toYamlString	log.cpp	/^std::string StdoutLogAppender::toYamlString() {$/;"	f	class:sylar::StdoutLogAppender	signature:()
 sylar::StringFormatItem	log.cpp	/^class StringFormatItem : public  LogFormatter::FormatItem {$/;"	c	namespace:sylar	file:	inherits:LogFormatter::FormatItem
 sylar::StringFormatItem::StringFormatItem	log.cpp	/^    StringFormatItem(const std::string& str)$/;"	f	class:sylar::StringFormatItem	access:public	signature:(const std::string& str)
 sylar::StringFormatItem::m_string	log.cpp	/^    std::string m_string;$/;"	m	class:sylar::StringFormatItem	file:	access:private
@@ -513,8 +539,16 @@ sylar::TabFormatItem::TabFormatItem	log.cpp	/^    TabFormatItem(const std::strin
 sylar::TabFormatItem::m_string	log.cpp	/^    std::string m_string;$/;"	m	class:sylar::TabFormatItem	file:	access:private
 sylar::ThreadIdFormatItem	log.cpp	/^class ThreadIdFormatItem : public  LogFormatter::FormatItem {$/;"	c	namespace:sylar	file:	inherits:LogFormatter::FormatItem
 sylar::ThreadIdFormatItem::ThreadIdFormatItem	log.cpp	/^    ThreadIdFormatItem(const std::string& str = "") {}$/;"	f	class:sylar::ThreadIdFormatItem	access:public	signature:(const std::string& str = �)
-sylar::g_log_defines	log.cpp	/^sylar::ConfigVar<std::set<LogDefine> > g_log_defines = $/;"	m	namespace:sylar	file:
+sylar::__log_init	log.cpp	/^static LogIniter __log_init;$/;"	m	namespace:sylar	file:
+sylar::g_log_defines	log.cpp	/^sylar::ConfigVar<std::set<LogDefine> >::ptr g_log_defines = $/;"	m	namespace:sylar	file:
 toString	config.h	/^    virtual std::string toString() = 0;$/;"	p	class:sylar::ConfigVarBase	access:public	signature:()
+toYamlString	log.cpp	/^std::string FileLogAppender::toYamlString() {$/;"	f	class:sylar::FileLogAppender	signature:()
+toYamlString	log.cpp	/^std::string Logger::toYamlString() {$/;"	f	class:sylar::Logger	signature:()
+toYamlString	log.cpp	/^std::string LoggerManager::toYamlString() {$/;"	f	class:sylar::LoggerManager	signature:()
+toYamlString	log.cpp	/^std::string StdoutLogAppender::toYamlString() {$/;"	f	class:sylar::StdoutLogAppender	signature:()
+toYamlString	log.h	/^    std::string toYamlString();$/;"	p	class:sylar::Logger	access:public	signature:()
+toYamlString	log.h	/^    std::string toYamlString();$/;"	p	class:sylar::LoggerManager	access:public	signature:()
+toYamlString	log.h	/^    virtual std::string toYamlString() = 0;$/;"	p	class:sylar::LogAppender	access:public	signature:()
 type	log.cpp	/^    int type = 0;   \/\/ 1 File, 2 Stdout$/;"	m	struct:sylar::LogAppenderDefine	file:	access:public
 warn	log.cpp	/^void Logger::warn(LogEvent::ptr event) {$/;"	f	class:sylar::Logger	signature:(LogEvent::ptr event)
 warn	log.h	/^    void warn(LogEvent::ptr event);$/;"	p	class:sylar::Logger	access:public	signature:(LogEvent::ptr event)

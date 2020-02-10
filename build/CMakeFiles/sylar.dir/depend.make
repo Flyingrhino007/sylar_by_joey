@@ -7,6 +7,7 @@ CMakeFiles/sylar.dir/src/config.cc.o: ../src/log.h
 CMakeFiles/sylar.dir/src/config.cc.o: ../src/singleton.h
 CMakeFiles/sylar.dir/src/config.cc.o: ../src/util.h
 
+CMakeFiles/sylar.dir/src/log.cpp.o: ../src/config.h
 CMakeFiles/sylar.dir/src/log.cpp.o: ../src/log.cpp
 CMakeFiles/sylar.dir/src/log.cpp.o: ../src/log.h
 CMakeFiles/sylar.dir/src/log.cpp.o: ../src/singleton.h

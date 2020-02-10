@@ -339,8 +339,8 @@ public:
     template<class T>
     static typename ConfigVar<T>::ptr Lookup(const std::string& name
             , const T& default_value, const std::string& description = "") {
-        auto it = s_datas.find(name);
-        if(it != s_datas.end()) {
+        auto it = GetDatas().find(name);
+        if(it != GetDatas().end()) {
             // 存在，只需要转换到对应的目标类型
             auto tmp = std::dynamic_pointer_cast<ConfigVar<T> >(it->second);
             if(tmp) {
@@ -363,14 +363,14 @@ public:
         }
 
         typename ConfigVar<T>::ptr v(new ConfigVar<T>(name, default_value, description));
-        s_datas[name] = v;
+        GetDatas()[name] = v;
         return v;
     }
 
     template<class T>
     static typename ConfigVar<T>::ptr Lookup(const std::string& name) {
-        auto it = s_datas.find(name);
-        if(it == s_datas.end()) {
+        auto it = GetDatas().find(name);
+        if(it == GetDatas().end()) {
             // 以name寻找，未找到
             return nullptr;
         }
@@ -381,7 +381,11 @@ public:
 
     static ConfigVarBase::ptr LookupBase(const std::string& name);
 private:
-    static ConfigVarMap s_datas;
+    // 使用静态方法来调用静态变量 s_datas，确保其他（静态）方法通过调用 GetDatas()时，s_datas已初始化
+    static ConfigVarMap& GetDatas() {
+        static ConfigVarMap s_datas;
+        return s_datas;
+    }
 };
 
 }

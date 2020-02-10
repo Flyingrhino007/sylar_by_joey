@@ -201,15 +201,27 @@ void test_class() {
     SYLAR_LOG_INFO(SYLAR_LOG_ROOT()) << "class.map_vec after: "  << g_person_map_vec->toString();
 }
 
-int main(int argc, char** argv) {
+void test_log() {
+    static sylar::Logger::ptr system_log = SYLAR_LOG_NAME("system");
+    SYLAR_LOG_INFO(system_log) << "hello system" << std::endl;
+    std::cout << "***********************" << std::endl << sylar::LoggerMgr::GetInstance()->toYamlString() << std::endl << "***********************" << std::endl;
+    YAML::Node root = YAML::LoadFile("/home/sylar/bin/conf/log.yml");
+    sylar::Config::LoadFromYaml(root);
+    std::cout << " 1 1 1 1 1 1 1 1 1 " << std::endl;
+    std::cout << "***********************" << std::endl << sylar::LoggerMgr::GetInstance()->toYamlString() << std::endl << "***********************" << std::endl;
+    SYLAR_LOG_INFO(system_log) << "hello system" << std::endl;
+    SYLAR_LOG_INFO(SYLAR_LOG_NAME("root")) << "hello root" << std::endl;
 
-//    SYLAR_LOG_INFO(SYLAR_LOG_ROOT()) << g_int_value_config->getValue();
-//    SYLAR_LOG_INFO(SYLAR_LOG_ROOT()) << g_int_value_config2->getValue();
-//    SYLAR_LOG_INFO(SYLAR_LOG_ROOT()) << g_float_value_config->toString();
+    system_log->setFormatter("%d - %m%n");
+    SYLAR_LOG_INFO(system_log) << "hello system again" << std::endl;
+}
+
+int main(int argc, char** argv) {
 
      // test_yaml();
     // test_config();
-    test_class();
+    //test_class();
+    test_log();
 
     return 0;
 }

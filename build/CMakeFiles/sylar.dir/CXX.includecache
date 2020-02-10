@@ -6,10 +6,6 @@
 
 #IncludeRegexTransform: 
 
-/home/sylar/src/config.cc
-../src/config.h
-/home/sylar/src/config.h
-
 /home/sylar/src/config.h
 memory
 -
@@ -39,6 +35,20 @@ unordered_set
 -
 functional
 -
+
+/home/sylar/src/log.cpp
+log.h
+/home/sylar/src/log.h
+map
+-
+string
+-
+iostream
+-
+functional
+-
+config.h
+/home/sylar/src/config.h
 
 /home/sylar/src/log.h
 string

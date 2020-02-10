@@ -40,7 +40,7 @@
 #define SYLAR_LOG_ROOT() sylar::LoggerMgr::GetInstance()->getRoot()
 #define SYLAR_LOG_NAME(name) sylar::LoggerMgr::GetInstance()->getLogger(name)
 
-namespace sylar {
+namespace sylar { 
 
 class Logger;
 class LoggerManager;
@@ -58,6 +58,7 @@ public:
     };
 
     static const char* ToString(LogLevel::Level level);
+    static LogLevel::Level FromString(const std::string& str);
 };
 
 
@@ -129,15 +130,16 @@ public:
                 LogLevel::Level level, LogEvent::ptr event) = 0;
     };
 
-    void init();                                // 解析pattern
-    bool isError() const { return m_error;}
+    void init();                                // 构造函数中调用，解析pattern
+    bool isError() const { return m_Error;}
+    const std::string getFormatter() const { return m_pattern;}
 private:
     // 日志格式模板
     std::string m_pattern;                 
     // 日志格式解析后格式
     std::vector<FormatItem::ptr> m_items;       // 定义很多不同的子类，每个子类负责输出对应的内容
-    // 是否有错误
-    bool m_error = false;
+    // 标记在 init 方法中解析的 m_pattern 是否有错误
+    bool m_Error = false;
 
 private:
 
@@ -146,18 +148,21 @@ private:
 
 // 输出到抽象文件或控制台的基类
 class LogAppender {
+friend class Logger;
 public:
     typedef std::shared_ptr<LogAppender> ptr;
     virtual ~LogAppender() {}
 
     virtual void log(std::shared_ptr<Logger> logger, LogLevel::Level level, LogEvent::ptr event) = 0;
+    virtual std::string toYamlString() = 0;
 
-    void setFormatter(LogFormatter::ptr val) { m_formatter = val;}
+    void setFormatter(LogFormatter::ptr val);
     void setLevel(LogLevel::Level val) { m_level = val;}
 
     LogFormatter::ptr getFormatter() const { return m_formatter;}
 protected:
     // protected 子类可用
+    bool m_hasFormatter = false;                    // 该输出地，是否已定义输出格式
     LogLevel::Level m_level = LogLevel::DEBUG;      // 初始化level，不然会随机赋值，造成无法正常输出
     LogFormatter::ptr m_formatter;                  // 记录的格式
 };
@@ -167,6 +172,7 @@ class StdoutLogAppender : public LogAppender {
 public:
     typedef std::shared_ptr<StdoutLogAppender> ptr;
     void log(std::shared_ptr<Logger> logger, LogLevel::Level level, LogEvent::ptr event) override;   // override描述从虚基类继承出来的
+    std::string toYamlString() override;
 };
 
 // Appender to file
@@ -175,6 +181,7 @@ public:
     typedef std::shared_ptr<FileLogAppender> ptr;
     FileLogAppender(const std::string& flename);
     void log(std::shared_ptr<Logger> logger, LogLevel::Level level, LogEvent::ptr event) override;
+    std::string toYamlString() override;
 
     // 重新打开文件，文件打开成功，返回true
     bool reopen();
@@ -206,22 +213,24 @@ public:
 
     void addAppender(LogAppender::ptr appender);
     void delAppender(LogAppender::ptr appender);
-    void clearAppenders();
+    void clearAppenders();                      // 清空输出地
     LogLevel::Level getLevel() const {return m_level;}
     void setLevel(LogLevel::Level val) {m_level = val;}
 
     const std::string& getName() const { return m_name;}
 
-    void setFormatter(LogFormatter::tr val);
+    void setFormatter(LogFormatter::ptr val);
     void setFormatter(const std::string& val);
 
     LogFormatter::ptr getFormatter();
+
+    std::string toYamlString();
 private:
     std::string m_name;                         // Logger name
     LogLevel::Level m_level;                    // log level
     std::list<LogAppender::ptr> m_appenders;    // Appender set
     LogFormatter::ptr m_formatter;              // 初始化时使用
-    Logger::ptr m_logger;
+    Logger::ptr m_root;                         // 主日志器
 };
 
 
@@ -233,8 +242,9 @@ public:
     void init();                    // 方便从配置文件直接读入
 
     Logger::ptr getRoot() const { return m_root;} 
+    std::string toYamlString();
 private:
-    std::map<std::string, Logger::ptr> m_logger;
+    std::map<std::string, Logger::ptr> m_loggers;
     Logger::ptr m_root;
 };
 
